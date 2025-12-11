@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans:wght@300;400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+body {
+  font-family: 'Open Sans', sans-serif;
+  background-color: #F8FAFC;
+  color: #1E293B;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Composants réutilisables */
+@layer components {
+  .btn-primary {
+    @apply bg-bleu-royal text-white font-montserrat font-semibold py-3 px-6 rounded-btn hover:bg-blue-800 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-white border-2 border-bleu-royal text-bleu-royal font-montserrat font-semibold py-3 px-6 rounded-btn hover:bg-bleu-ciel transition-colors;
+  }
+  
+  .btn-cta {
+    @apply bg-or text-bleu-royal font-montserrat font-semibold py-3 px-6 rounded-btn hover:bg-yellow-500 transition-colors;
+  }
+  
+  .btn-disabled {
+    @apply bg-gray-200 text-gray-400 font-montserrat font-semibold py-3 px-6 rounded-btn cursor-not-allowed;
+  }
+  
+  .card {
+    @apply bg-white rounded-card shadow-card p-6;
+  }
+  
+  .input-field {
+    @apply w-full border border-gray-300 rounded-btn py-3 px-4 focus:outline-none focus:border-bleu-royal focus:ring-1 focus:ring-bleu-royal;
+  }
+  
+  .label {
+    @apply block text-gris-ardoise font-semibold mb-2;
+  }
+  
+  .page-title {
+    @apply text-3xl md:text-4xl font-montserrat font-bold text-bleu-royal;
+  }
+  
+  .section-title {
+    @apply text-2xl font-montserrat font-semibold text-bleu-royal;
+  }
+}
