@@ -129,7 +129,7 @@ const validateNote = [
 const validateTache = [
     body('titre_tache').trim().notEmpty().withMessage('Titre requis'),
     body('id_utilisateur').isInt().withMessage('Utilisateur assigné requis'),
-    body('id_evenement').isInt().withMessage('Événement requis'),
+    body('id_evenement').optional({ nullable: true }).isInt().withMessage('Événement invalide'),
     handleValidation
 ];
 

@@ -8,7 +8,8 @@ import {
   Trash2,
   MessageSquare,
   Clock,
-  Eye
+  Eye,
+  X
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -21,9 +22,9 @@ const AvisAdmin = () => {
   const [selectedAvis, setSelectedAvis] = useState(null);
 
   const statuts = [
-    { value: 'valide', label: 'En attente', color: 'bg-yellow-100 text-yellow-700' },
-    { value: 'approuve', label: 'Approuvé', color: 'bg-green-100 text-green-700' },
-    { value: 'rejete', label: 'Rejeté', color: 'bg-red-100 text-red-700' }
+    { value: 'en_attente', label: 'En attente', color: 'bg-yellow-100 text-yellow-700' },
+    { value: 'valide', label: 'Validé', color: 'bg-green-100 text-green-700' },
+    { value: 'refuse', label: 'Refusé', color: 'bg-red-100 text-red-700' }
   ];
 
   useEffect(() => {
@@ -44,22 +45,34 @@ const AvisAdmin = () => {
   const handleApprove = async (id) => {
     try {
       await api.patch(`/avis/${id}/validate`);
-      toast.success('Avis approuvé');
+      toast.success('Avis validé');
       fetchAvis();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Erreur lors de l\'approbation');
+      toast.error(err.response?.data?.message || 'Erreur lors de la validation');
     }
   };
 
   const handleReject = async (id) => {
-    if (!confirm('Voulez-vous vraiment rejeter cet avis ?')) return;
+    if (!confirm('Voulez-vous vraiment refuser cet avis ?')) return;
     
     try {
       await api.patch(`/avis/${id}/reject`);
-      toast.success('Avis rejeté');
+      toast.success('Avis refusé');
       fetchAvis();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Erreur lors du rejet');
+      toast.error(err.response?.data?.message || 'Erreur lors du refus');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('Voulez-vous vraiment supprimer cet avis ?')) return;
+    
+    try {
+      await api.delete(`/avis/${id}`);
+      toast.success('Avis supprimé');
+      fetchAvis();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Erreur lors de la suppression');
     }
   };
 
@@ -110,12 +123,12 @@ const AvisAdmin = () => {
 
   // Stats
   const stats = {
-    enAttente: avis.filter(a => a.statut_avis === 'valide').length,
-    approuve: avis.filter(a => a.statut_avis === 'approuve').length,
-    rejete: avis.filter(a => a.statut_avis === 'rejete').length,
-    moyenne: avis.length > 0 
-      ? (avis.filter(a => a.statut_avis === 'approuve').reduce((sum, a) => sum + a.note_avis, 0) / 
-         avis.filter(a => a.statut_avis === 'approuve').length || 0).toFixed(1)
+    enAttente: avis.filter(a => a.statut_avis === 'en_attente').length,
+    valide: avis.filter(a => a.statut_avis === 'valide').length,
+    refuse: avis.filter(a => a.statut_avis === 'refuse').length,
+    moyenne: avis.filter(a => a.statut_avis === 'valide').length > 0 
+      ? (avis.filter(a => a.statut_avis === 'valide').reduce((sum, a) => sum + a.note_avis, 0) / 
+         avis.filter(a => a.statut_avis === 'valide').length).toFixed(1)
       : 0
   };
 
@@ -143,8 +156,8 @@ const AvisAdmin = () => {
             <CheckCircle className="w-6 h-6 text-green-600" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-green-600">{stats.approuve}</p>
-            <p className="text-sm text-gray-500">Approuvés</p>
+            <p className="text-2xl font-bold text-green-600">{stats.valide}</p>
+            <p className="text-sm text-gray-500">Validés</p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
@@ -152,8 +165,8 @@ const AvisAdmin = () => {
             <XCircle className="w-6 h-6 text-red-600" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-red-600">{stats.rejete}</p>
-            <p className="text-sm text-gray-500">Rejetés</p>
+            <p className="text-2xl font-bold text-red-600">{stats.refuse}</p>
+            <p className="text-sm text-gray-500">Refusés</p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
@@ -209,7 +222,7 @@ const AvisAdmin = () => {
             <div 
               key={item.id_avis} 
               className={`card ${
-                item.statut_avis === 'valide' ? 'border-l-4 border-l-yellow-500' : ''
+                item.statut_avis === 'en_attente' ? 'border-l-4 border-l-yellow-500' : ''
               }`}
             >
               <div className="flex flex-col md:flex-row md:items-start gap-4">
@@ -247,40 +260,40 @@ const AvisAdmin = () => {
                     <Eye className="w-5 h-5" />
                   </button>
                   
-                  {item.statut_avis === 'valide' && (
+                  {item.statut_avis === 'en_attente' && (
                     <>
                       <button
                         onClick={() => handleApprove(item.id_avis)}
                         className="p-2 text-green-600 hover:bg-green-50 rounded-btn"
-                        title="Approuver"
+                        title="Valider"
                       >
                         <CheckCircle className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => handleReject(item.id_avis)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-btn"
-                        title="Rejeter"
+                        title="Refuser"
                       >
                         <XCircle className="w-5 h-5" />
                       </button>
                     </>
                   )}
                   
-                  {item.statut_avis === 'rejete' && (
+                  {item.statut_avis === 'refuse' && (
                     <button
                       onClick={() => handleApprove(item.id_avis)}
                       className="p-2 text-green-600 hover:bg-green-50 rounded-btn"
-                      title="Approuver"
+                      title="Valider"
                     >
                       <CheckCircle className="w-5 h-5" />
                     </button>
                   )}
                   
-                  {item.statut_avis === 'approuve' && (
+                  {item.statut_avis === 'valide' && (
                     <button
                       onClick={() => handleReject(item.id_avis)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-btn"
-                      title="Rejeter"
+                      title="Refuser"
                     >
                       <XCircle className="w-5 h-5" />
                     </button>
@@ -309,7 +322,7 @@ const AvisAdmin = () => {
                 Détails de l'avis
               </h2>
               <button onClick={() => setShowDetailModal(false)} className="text-gray-400 hover:text-gray-600">
-                <XCircle className="w-6 h-6" />
+                <X className="w-6 h-6" />
               </button>
             </div>
             <div className="p-6 space-y-4">
@@ -352,22 +365,22 @@ const AvisAdmin = () => {
 
               {/* Actions */}
               <div className="flex gap-3 pt-4 border-t">
-                {selectedAvis.statut_avis !== 'approuve' && (
+                {selectedAvis.statut_avis !== 'valide' && (
                   <button
                     onClick={() => { handleApprove(selectedAvis.id_avis); setShowDetailModal(false); }}
                     className="btn-primary flex-1 flex items-center justify-center gap-2"
                   >
                     <CheckCircle className="w-5 h-5" />
-                    Approuver
+                    Valider
                   </button>
                 )}
-                {selectedAvis.statut_avis !== 'rejete' && (
+                {selectedAvis.statut_avis !== 'refuse' && (
                   <button
                     onClick={() => { handleReject(selectedAvis.id_avis); setShowDetailModal(false); }}
                     className="btn-secondary flex-1 flex items-center justify-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
                   >
                     <XCircle className="w-5 h-5" />
-                    Rejeter
+                    Refuser
                   </button>
                 )}
               </div>

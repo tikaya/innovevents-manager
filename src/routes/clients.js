@@ -19,8 +19,11 @@ router.get('/', authenticate, authorize('admin', 'employe'), ClientController.ge
 router.get('/search', authenticate, authorize('admin', 'employe'), ClientController.search);
 router.get('/:id', authenticate, authorize('admin', 'employe'), validateId, ClientController.getById);
 router.get('/:id/evenements', authenticate, authorize('admin', 'employe'), validateId, ClientController.getEvenements);
+
+// Admin seulement
 router.post('/', authenticate, authorize('admin'), validateClient, ClientController.create);
 router.put('/:id', authenticate, authorize('admin'), validateId, ClientController.update);
+router.post('/:id/reset-password', authenticate, authorize('admin'), validateId, ClientController.resetPassword);
 router.delete('/:id', authenticate, authorize('admin'), validateId, ClientController.remove);
 
 module.exports = router;

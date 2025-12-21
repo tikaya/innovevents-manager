@@ -1,7 +1,55 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Mic, Users, PartyPopper, ArrowRight, Star, Calendar, MapPin, CheckCircle } from 'lucide-react';
+import api from '../../services/api';
 
 const Home = () => {
+  const [prochainEvenement, setProchainEvenement] = useState(null);
+  const [averageNote, setAverageNote] = useState(null);
+
+  useEffect(() => {
+    fetchProchainEvenement();
+    fetchAverageNote();
+  }, []);
+
+  const fetchProchainEvenement = async () => {
+    try {
+      const response = await api.get('/evenements/public');
+      const evenements = response.data.data || [];
+      
+      // Trouver le prochain événement (date >= aujourd'hui)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const futurs = evenements
+        .filter(e => new Date(e.date_debut) >= today)
+        .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut));
+      
+      if (futurs.length > 0) {
+        setProchainEvenement(futurs[0]);
+      }
+    } catch (err) {
+      console.error('Erreur événements:', err);
+    }
+  };
+
+  const fetchAverageNote = async () => {
+    try {
+      const response = await api.get('/avis/average');
+      setAverageNote(response.data.data?.moyenne || 0);
+    } catch (err) {
+      console.error('Erreur moyenne:', err);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short'
+    });
+  };
+
   const services = [
     {
       icon: <Mic className="w-8 h-8" />,
@@ -91,20 +139,34 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Hero Image/Card */}
+            {/* Hero Image/Card - Dynamique */}
             <div className="hidden md:block">
               <div className="relative">
                 <div className="bg-white rounded-card shadow-2xl p-6 transform rotate-3 hover:rotate-0 transition-transform duration-300">
                   <div className="bg-bleu-ciel rounded-lg h-48 mb-4 flex items-center justify-center">
                     <Calendar className="w-16 h-16 text-bleu-royal/30" />
                   </div>
-                  <h3 className="font-montserrat font-bold text-gris-ardoise">Prochain événement</h3>
-                  <p className="text-gray-500 text-sm">Séminaire Tech Corp - 15 Janv.</p>
+                  {prochainEvenement ? (
+                    <>
+                      <h3 className="font-montserrat font-bold text-gris-ardoise">Prochain événement</h3>
+                      <p className="text-gray-500 text-sm">
+                        {prochainEvenement.nom_evenement} - {formatDate(prochainEvenement.date_debut)}
+                      </p>
+                      <p className="text-xs text-bleu-royal mt-1">
+                        {prochainEvenement.type_evenement}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="font-montserrat font-bold text-gris-ardoise">Votre événement</h3>
+                      <p className="text-gray-500 text-sm">Contactez-nous pour organiser le vôtre !</p>
+                    </>
+                  )}
                 </div>
                 <div className="absolute -bottom-4 -left-4 bg-or text-bleu-royal rounded-card p-4 shadow-lg">
                   <div className="flex items-center gap-2">
                     <Star className="w-5 h-5 fill-current" />
-                    <span className="font-bold">4.9/5</span>
+                    <span className="font-bold">{averageNote ? averageNote.toFixed(1) : '5.0'}/5</span>
                   </div>
                   <p className="text-xs">Note moyenne</p>
                 </div>

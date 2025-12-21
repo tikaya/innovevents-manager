@@ -22,8 +22,12 @@ const getMe = asyncHandler(async (req, res) => {
 });
 
 const create = asyncHandler(async (req, res) => {
-    const client = await ClientService.create(req.body);
-    res.status(201).json({ success: true, data: client });
+    const { client, tempPassword } = await ClientService.create(req.body);
+    res.status(201).json({ 
+        success: true, 
+        data: client,
+        message: 'Client créé. Un email avec les identifiants a été envoyé.'
+    });
 });
 
 const update = asyncHandler(async (req, res) => {
@@ -58,4 +62,9 @@ const search = asyncHandler(async (req, res) => {
     res.json({ success: true, data: clients });
 });
 
-module.exports = { getAll, getById, getMe, create, update, updateMe, remove, deleteMe, getEvenements, search };
+const resetPassword = asyncHandler(async (req, res) => {
+    await ClientService.resetPassword(req.params.id);
+    res.json({ success: true, message: 'Nouveau mot de passe envoyé par email' });
+});
+
+module.exports = { getAll, getById, getMe, create, update, updateMe, remove, deleteMe, getEvenements, search, resetPassword };

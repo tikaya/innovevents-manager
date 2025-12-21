@@ -16,12 +16,14 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 const TachesAdmin = () => {
-    const { user } = useAuth();
+  const { user } = useAuth();
   const [taches, setTaches] = useState([]);
   const [evenements, setEvenements] = useState([]);
+  const [employes, setEmployes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
+  const [filterAssigne, setFilterAssigne] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [selectedTache, setSelectedTache] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -31,7 +33,8 @@ const TachesAdmin = () => {
     description_tache: '',
     statut_tache: 'a_faire',
     date_echeance: '',
-    id_evenement: ''
+    id_evenement: '',
+    id_utilisateur: ''
   });
 
   const statuts = [
@@ -43,6 +46,7 @@ const TachesAdmin = () => {
   useEffect(() => {
     fetchTaches();
     fetchEvenements();
+    fetchEmployes();
   }, []);
 
   const fetchTaches = async () => {
@@ -65,6 +69,15 @@ const TachesAdmin = () => {
     }
   };
 
+  const fetchEmployes = async () => {
+    try {
+      const response = await api.get('/employes');
+      setEmployes(response.data.data || []);
+    } catch (err) {
+      console.error('Erreur employés:', err);
+    }
+  };
+
   const handleCreate = () => {
     setSelectedTache(null);
     setFormData({
@@ -72,7 +85,8 @@ const TachesAdmin = () => {
       description_tache: '',
       statut_tache: 'a_faire',
       date_echeance: '',
-      id_evenement: ''
+      id_evenement: '',
+      id_utilisateur: user.id_utilisateur // Par défaut assigné à l'admin
     });
     setShowFormModal(true);
   };
@@ -84,7 +98,8 @@ const TachesAdmin = () => {
       description_tache: tache.description_tache || '',
       statut_tache: tache.statut_tache || 'a_faire',
       date_echeance: tache.date_echeance ? tache.date_echeance.split('T')[0] : '',
-      id_evenement: tache.id_evenement || ''
+      id_evenement: tache.id_evenement || '',
+      id_utilisateur: tache.id_utilisateur || user.id_utilisateur
     });
     setShowFormModal(true);
   };
@@ -109,7 +124,8 @@ const TachesAdmin = () => {
     };
 
     try {
-      await api.patch(`/taches/${tache.id_tache}/statut`, {
+      await api.put(`/taches/${tache.id_tache}`, {
+        ...tache,
         statut_tache: nextStatut[tache.statut_tache]
       });
       toast.success('Statut mis à jour');
@@ -130,7 +146,7 @@ const TachesAdmin = () => {
         statut_tache: formData.statut_tache,
         date_echeance: formData.date_echeance || null,
         id_evenement: formData.id_evenement ? parseInt(formData.id_evenement) : null,
-        id_utilisateur: user.id_utilisateur
+        id_utilisateur: formData.id_utilisateur ? parseInt(formData.id_utilisateur) : user.id_utilisateur
       };
 
       if (selectedTache) {
@@ -149,7 +165,15 @@ const TachesAdmin = () => {
     }
   };
 
-  
+  // Liste des assignés (admin + employés)
+  const assignesList = [
+    { id: user.id_utilisateur, label: `${user.prenom} ${user.nom} (Moi)` },
+    ...employes.map(e => ({
+      id: e.id_utilisateur,
+      label: `${e.prenom} ${e.nom}`
+    }))
+  ];
+
   const filteredTaches = taches.filter(t => {
     const matchSearch = 
       t.titre_tache?.toLowerCase().includes(search.toLowerCase()) ||
@@ -157,7 +181,8 @@ const TachesAdmin = () => {
       t.assignee_prenom?.toLowerCase().includes(search.toLowerCase()) ||
       t.assignee_nom?.toLowerCase().includes(search.toLowerCase());
     const matchStatut = !filterStatut || t.statut_tache === filterStatut;
-    return matchSearch && matchStatut;
+    const matchAssigne = !filterAssigne || t.id_utilisateur === parseInt(filterAssigne);
+    return matchSearch && matchStatut && matchAssigne;
   });
 
   const formatDate = (dateString) => {
@@ -187,6 +212,7 @@ const TachesAdmin = () => {
 
   // Stats
   const stats = {
+    total: taches.length,
     aFaire: taches.filter(t => t.statut_tache === 'a_faire').length,
     enCours: taches.filter(t => t.statut_tache === 'en_cours').length,
     termine: taches.filter(t => t.statut_tache === 'termine').length
@@ -198,7 +224,7 @@ const TachesAdmin = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-montserrat font-bold text-gris-ardoise">Tâches</h1>
-          <p className="text-gray-500">Gérez les tâches de vos événements</p>
+          <p className="text-gray-500">Gérez et assignez les tâches de vos événements</p>
         </div>
         <button onClick={handleCreate} className="btn-primary flex items-center gap-2">
           <Plus className="w-5 h-5" />
@@ -207,7 +233,16 @@ const TachesAdmin = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="card flex items-center gap-4">
+          <div className="w-12 h-12 bg-bleu-ciel rounded-full flex items-center justify-center">
+            <CheckCircle className="w-6 h-6 text-bleu-royal" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-bleu-royal">{stats.total}</p>
+            <p className="text-sm text-gray-500">Total</p>
+          </div>
+        </div>
         <div className="card flex items-center gap-4">
           <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
             <AlertCircle className="w-6 h-6 text-red-600" />
@@ -258,6 +293,16 @@ const TachesAdmin = () => {
             <option value="">Tous les statuts</option>
             {statuts.map(s => (
               <option key={s.value} value={s.value}>{s.label}</option>
+            ))}
+          </select>
+          <select
+            className="input-field md:w-48"
+            value={filterAssigne}
+            onChange={(e) => setFilterAssigne(e.target.value)}
+          >
+            <option value="">Tous les assignés</option>
+            {assignesList.map(a => (
+              <option key={a.id} value={a.id}>{a.label}</option>
             ))}
           </select>
         </div>
@@ -318,7 +363,9 @@ const TachesAdmin = () => {
                     )}
                     <span className="flex items-center gap-1">
                       <User className="w-3 h-3" />
-                      {tache.assignee_prenom} {tache.assignee_nom}
+                      <span className="font-semibold text-bleu-royal">
+                        {tache.assignee_prenom} {tache.assignee_nom}
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -415,6 +462,31 @@ const TachesAdmin = () => {
                     onChange={(e) => setFormData({...formData, date_echeance: e.target.value})}
                   />
                 </div>
+              </div>
+
+              {/* Assigné */}
+              <div>
+                <label className="label flex items-center gap-2">
+                  <User className="w-4 h-4 text-bleu-royal" />
+                  Assigner à *
+                </label>
+                <select
+                  className="input-field"
+                  value={formData.id_utilisateur}
+                  onChange={(e) => setFormData({...formData, id_utilisateur: e.target.value})}
+                  required
+                >
+                  <option value="">Sélectionner un assigné</option>
+                  <option value={user.id_utilisateur}>Moi ({user.prenom} {user.nom})</option>
+                  {employes.map(e => (
+                    <option key={e.id_utilisateur} value={e.id_utilisateur}>
+                      {e.prenom} {e.nom} (Employé)
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  L'assigné pourra modifier le statut de cette tâche depuis son espace
+                </p>
               </div>
 
               <div>

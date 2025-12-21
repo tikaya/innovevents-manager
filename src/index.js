@@ -17,6 +17,7 @@ const path = require('path');
 const routes = require('./routes');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 const { checkConnection } = require('./config/database');
+const { connectMongoDB, closeMongoDB } = require('./config/mongodb');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -55,6 +56,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Cookie parser
 app.use(cookieParser());
+
+// Middleware pour capturer l'IP
+app.use((req, res, next) => {
+    req.clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
+                   req.connection?.remoteAddress || 
+                   req.socket?.remoteAddress ||
+                   req.ip ||
+                   'unknown';
+    next();
+});
 
 // Logging (dev uniquement)
 if (process.env.NODE_ENV === 'development') {
@@ -103,6 +114,10 @@ const startServer = async () => {
         await checkConnection();
         console.log('✅ PostgreSQL connecté');
 
+        // Connexion MongoDB
+        await connectMongoDB();
+        console.log('✅ MongoDB connecté');
+
         // Démarrage serveur
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`🚀 Serveur démarré sur le port ${PORT}`);
@@ -116,13 +131,15 @@ const startServer = async () => {
 };
 
 // Gestion arrêt propre
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
     console.log('👋 Arrêt du serveur...');
+    await closeMongoDB();
     process.exit(0);
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
     console.log('👋 Arrêt du serveur...');
+    await closeMongoDB();
     process.exit(0);
 });
 

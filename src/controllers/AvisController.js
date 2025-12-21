@@ -4,6 +4,7 @@
  */
 
 const AvisService = require('../services/AvisService');
+const { LogService, ACTION_TYPES } = require('../services/LogService');
 const { asyncHandler } = require('../middlewares/errorHandler');
 
 const getAll = asyncHandler(async (req, res) => {
@@ -33,11 +34,37 @@ const create = asyncHandler(async (req, res) => {
 
 const validate = asyncHandler(async (req, res) => {
     const avis = await AvisService.validate(req.params.id);
+    
+    // Log validation avis
+    await LogService.log(
+        ACTION_TYPES.VALIDATION_AVIS,
+        req.user.id_utilisateur,
+        { 
+            id_avis: parseInt(req.params.id),
+            note: avis.note_avis,
+            id_evenement: avis.id_evenement
+        },
+        req.clientIp
+    );
+    
     res.json({ success: true, data: avis });
 });
 
 const reject = asyncHandler(async (req, res) => {
     const avis = await AvisService.reject(req.params.id);
+    
+    // Log refus avis
+    await LogService.log(
+        ACTION_TYPES.REFUS_AVIS,
+        req.user.id_utilisateur,
+        { 
+            id_avis: parseInt(req.params.id),
+            note: avis.note_avis,
+            id_evenement: avis.id_evenement
+        },
+        req.clientIp
+    );
+    
     res.json({ success: true, data: avis });
 });
 

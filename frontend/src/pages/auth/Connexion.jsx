@@ -13,20 +13,25 @@ const Connexion = () => {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-   const onSubmit = async (data) => {
+  const onSubmit = async (data) => {
     setLoading(true);
     setError('');
 
     try {
       const response = await login(data.email, data.mot_de_passe);
       
-      // Redirection selon le rôle
-      const role = response.data?.user?.role;
-      console.log('Login response:', response);
-      console.log('Role:', role);
+      // Vérifier si l'utilisateur doit changer son mot de passe
+      if (response.doit_changer_mdp) {
+        navigate('/changer-mot-de-passe');
+        return;
+      }
       
-      if (role === 'admin' || role === 'employe') {
+      const role = response.data?.user?.role;
+      
+      if (role === 'admin') {
         navigate('/admin');
+      } else if (role === 'employe') {
+        navigate('/employe');
       } else if (role === 'client') {
         navigate('/client');
       } else {

@@ -16,6 +16,8 @@ const tacheRoutes = require('./taches');
 const avisRoutes = require('./avis');
 const contactRoutes = require('./contacts');
 const dashboardRoutes = require('./dashboard');
+const employeRoutes = require('./employes');
+const logRoutes = require('./logs');
 
 // Health check
 router.get('/health', (req, res) => {
@@ -33,5 +35,7 @@ router.use('/taches', tacheRoutes);
 router.use('/avis', avisRoutes);
 router.use('/contacts', contactRoutes);
 router.use('/dashboard', dashboardRoutes);
+router.use('/employes', employeRoutes);
+router.use('/logs', logRoutes);
 
 module.exports = router;

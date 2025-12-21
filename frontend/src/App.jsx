@@ -6,6 +6,7 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import AdminLayout from './components/layout/AdminLayout';
 import ClientLayout from './components/layout/ClientLayout';
+import EmployeLayout from './components/layout/EmployeLayout';
 
 // Pages publiques
 import Home from './pages/public/Home';
@@ -19,6 +20,7 @@ import MentionsLegales from './pages/public/MentionsLegales';
 import Connexion from './pages/auth/Connexion';
 import Inscription from './pages/auth/Inscription';
 import MotDePasseOublie from './pages/auth/MotDePasseOublie';
+import ChangerMotDePasse from './pages/auth/ChangerMotDePasse';
 
 // Pages admin
 import Dashboard from './pages/admin/Dashboard';
@@ -28,6 +30,8 @@ import EvenementsAdmin from './pages/admin/EvenementsAdmin';
 import DevisAdmin from './pages/admin/DevisAdmin';
 import TachesAdmin from './pages/admin/TachesAdmin';
 import AvisAdmin from './pages/admin/AvisAdmin';
+import Employes from './pages/admin/Employes';
+import Logs from './pages/admin/Logs';
 
 // Pages client
 import DashboardClient from './pages/client/DashboardClient';
@@ -35,6 +39,14 @@ import MesEvenements from './pages/client/MesEvenements';
 import MesDevis from './pages/client/MesDevis';
 import DeposerAvis from './pages/client/DeposerAvis';
 import MonProfil from './pages/client/MonProfil';
+
+// Pages employe
+import DashboardEmploye from './pages/employe/DashboardEmploye';
+import ClientsEmploye from './pages/employe/ClientsEmploye';
+import EvenementsEmploye from './pages/employe/EvenementsEmploye';
+import NotesEmploye from './pages/employe/NotesEmploye';
+import TachesEmploye from './pages/employe/TachesEmploye';
+import AvisEmploye from './pages/employe/AvisEmploye';
 
 // Layout avec Header/Footer
 const PublicLayout = ({ children }) => (
@@ -80,6 +92,8 @@ function App() {
           <Route path="/connexion" element={<AuthLayout><Connexion /></AuthLayout>} />
           <Route path="/inscription" element={<AuthLayout><Inscription /></AuthLayout>} />
           <Route path="/mot-de-passe-oublie" element={<AuthLayout><MotDePasseOublie /></AuthLayout>} />
+          <Route path="/changer-mot-de-passe" element={<AuthLayout><ChangerMotDePasse /></AuthLayout>} />
+
           {/* Routes admin */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
@@ -89,6 +103,8 @@ function App() {
             <Route path="devis" element={<DevisAdmin />} />
             <Route path="taches" element={<TachesAdmin />} />
             <Route path="avis" element={<AvisAdmin />} />
+            <Route path="employes" element={<Employes />} />
+            <Route path="logs" element={<Logs />} />
           </Route>
 
           {/* Routes client */}
@@ -98,6 +114,16 @@ function App() {
             <Route path="devis" element={<MesDevis />} />
             <Route path="avis" element={<DeposerAvis />} />
             <Route path="profil" element={<MonProfil />} />
+          </Route>
+
+          {/* Routes employe */}
+          <Route path="/employe" element={<EmployeLayout />}>
+            <Route index element={<DashboardEmploye />} />
+            <Route path="clients" element={<ClientsEmploye />} />
+            <Route path="evenements" element={<EvenementsEmploye />} />
+            <Route path="notes" element={<NotesEmploye />} />
+            <Route path="taches" element={<TachesEmploye />} />
+            <Route path="avis" element={<AvisEmploye />} />
           </Route>
         </Routes>
       </Router>

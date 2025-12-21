@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const Utilisateur = require('../models/Utilisateur');
 
 class AuthService {
-        /**
+    /**
      * Connexion utilisateur
      */
     static async login(email, password) {
@@ -21,8 +21,6 @@ class AuthService {
         }
 
         console.log('🔍 User status:', user.statut_utilisateur);
-        console.log('🔍 Hash from DB:', user.mot_de_passe);
-        console.log('🔍 Password received:', password);
 
         if (user.statut_utilisateur !== 'actif') {
             throw new Error('Compte suspendu ou inactif');
@@ -41,7 +39,7 @@ class AuthService {
         return {
             token,
             user: userWithoutPassword,
-            doit_changer_mdp: user.doit_changer_mdp
+            doit_changer_mdp: user.doit_changer_mdp || false
         };
     }
 
@@ -98,17 +96,23 @@ class AuthService {
      * Mot de passe oublié - génère un nouveau
      */
     static async forgotPassword(email) {
+        console.log('🔐 forgotPassword called for:', email);
+        
         const user = await Utilisateur.findByEmail(email);
         if (!user) {
-            // Sécurité : ne pas révéler si l'email existe
-            return true;
+            console.log('🔐 User not found');
+            return { user: null, tempPassword: null };
         }
 
+        console.log('�� User found, ID:', user.id_utilisateur);
+        
         const tempPassword = this.generateTempPassword();
+        console.log('🔐 Temp password generated');
+        
         await Utilisateur.updatePassword(user.id_utilisateur, tempPassword);
         await Utilisateur.update(user.id_utilisateur, { doit_changer_mdp: true });
+        console.log('🔐 Password updated, doit_changer_mdp set to true');
 
-        // Retourne le mot de passe pour l'envoyer par email
         return { user, tempPassword };
     }
 
@@ -124,15 +128,18 @@ class AuthService {
         // Récupère le user avec mot de passe
         const userWithPwd = await Utilisateur.findByEmail(user.email);
 
-        // Vérifie ancien mot de passe (sauf si doit_changer_mdp)
-        if (!userWithPwd.doit_changer_mdp) {
-            const isValid = await Utilisateur.verifyPassword(oldPassword, userWithPwd.mot_de_passe);
-            if (!isValid) {
-                throw new Error('Ancien mot de passe incorrect');
-            }
+        // Vérifie ancien mot de passe
+        const isValid = await Utilisateur.verifyPassword(oldPassword, userWithPwd.mot_de_passe);
+        if (!isValid) {
+            throw new Error('Ancien mot de passe incorrect');
         }
 
+        // Mettre à jour le mot de passe
         await Utilisateur.updatePassword(userId, newPassword);
+        
+        // Remettre doit_changer_mdp à false
+        await Utilisateur.update(userId, { doit_changer_mdp: false });
+        
         return true;
     }
 
@@ -169,10 +176,10 @@ class AuthService {
         }
 
         // Génère un nom d'utilisateur unique
-        let nomUtilisateur = `${prenom.toLowerCase()}_${nom.toLowerCase()}`.replace(/\s+/g, '_');
+        let nomUtilisateur = `${prenom.toLowerCase()}_${nom.toLowerCase()}`.replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
         let counter = 1;
         while (await Utilisateur.findByUsername(nomUtilisateur)) {
-            nomUtilisateur = `${prenom.toLowerCase()}_${nom.toLowerCase()}_${counter}`.replace(/\s+/g, '_');
+            nomUtilisateur = `${prenom.toLowerCase()}_${nom.toLowerCase()}_${counter}`.replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
             counter++;
         }
 

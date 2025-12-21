@@ -34,6 +34,7 @@ const Avis = () => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
@@ -75,7 +76,7 @@ const Avis = () => {
                   {renderStars(Math.round(average.moyenne || 0))}
                 </div>
                 <div className="text-blue-200 text-sm">
-                  {average.total || 0} avis
+                  {avis.length} avis
                 </div>
               </div>
             </div>
@@ -117,12 +118,12 @@ const Avis = () => {
                 <div className="flex items-center gap-4 pt-4 border-t">
                   <div className="w-12 h-12 rounded-full bg-bleu-ciel flex items-center justify-center">
                     <span className="text-bleu-royal font-semibold">
-                      {item.prenom_client?.charAt(0)}{item.nom_client?.charAt(0)}
+                      {item.prenom_contact?.charAt(0)}{item.nom_entreprise_client?.charAt(0)}
                     </span>
                   </div>
                   <div>
                     <p className="font-semibold text-gris-ardoise">
-                      {item.prenom_client} {item.nom_client?.charAt(0)}.
+                      {item.nom_entreprise_client}
                     </p>
                     <p className="text-sm text-gray-500">
                       {item.nom_evenement}
@@ -130,7 +131,7 @@ const Avis = () => {
                   </div>
                 </div>
                 <p className="text-xs text-gray-400 mt-4">
-                  {formatDate(item.date_avis)}
+                  {formatDate(item.date_creation_avis)}
                 </p>
               </div>
             ))}

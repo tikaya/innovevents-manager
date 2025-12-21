@@ -10,7 +10,10 @@ import {
   Building,
   Mail,
   Phone,
-  X
+  X,
+  RefreshCw,
+  UserCheck,
+  UserX
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -79,7 +82,7 @@ const Clients = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Voulez-vous vraiment supprimer ce client ?')) return;
+    if (!confirm('Voulez-vous vraiment supprimer ce client ? Son compte utilisateur sera également supprimé.')) return;
     
     try {
       await api.delete(`/clients/${id}`);
@@ -87,6 +90,22 @@ const Clients = () => {
       fetchClients();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Erreur lors de la suppression');
+    }
+  };
+
+  const handleResetPassword = async (client) => {
+    if (!client.id_utilisateur) {
+      toast.error('Ce client n\'a pas de compte utilisateur');
+      return;
+    }
+    
+    if (!confirm(`Réinitialiser le mot de passe de ${client.prenom_contact} ${client.nom_contact} ? Un email sera envoyé.`)) return;
+
+    try {
+      await api.post(`/clients/${client.id_client}/reset-password`);
+      toast.success('Nouveau mot de passe envoyé par email');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Erreur');
     }
   };
 
@@ -100,7 +119,7 @@ const Clients = () => {
         toast.success('Client modifié avec succès');
       } else {
         await api.post('/clients', formData);
-        toast.success('Client créé avec succès');
+        toast.success('Client créé ! Un email avec les identifiants a été envoyé.');
       }
       setShowFormModal(false);
       fetchClients();
@@ -117,6 +136,13 @@ const Clients = () => {
            c.nom_contact?.toLowerCase().includes(search.toLowerCase());
   });
 
+  // Stats
+  const stats = {
+    total: clients.length,
+    avecCompte: clients.filter(c => c.id_utilisateur).length,
+    sansCompte: clients.filter(c => !c.id_utilisateur).length
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -131,6 +157,28 @@ const Clients = () => {
           <Plus className="w-5 h-5" />
           Nouveau client
         </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="card">
+          <p className="text-gray-500 text-sm">Total clients</p>
+          <p className="text-2xl font-bold text-bleu-royal">{stats.total}</p>
+        </div>
+        <div className="card">
+          <div className="flex items-center gap-2">
+            <UserCheck className="w-5 h-5 text-green-600" />
+            <p className="text-gray-500 text-sm">Avec compte</p>
+          </div>
+          <p className="text-2xl font-bold text-green-600">{stats.avecCompte}</p>
+        </div>
+        <div className="card">
+          <div className="flex items-center gap-2">
+            <UserX className="w-5 h-5 text-red-500" />
+            <p className="text-gray-500 text-sm">Sans compte</p>
+          </div>
+          <p className="text-2xl font-bold text-red-500">{stats.sansCompte}</p>
+        </div>
       </div>
 
       {/* Search */}
@@ -167,7 +215,7 @@ const Clients = () => {
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Contact</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Email</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Téléphone</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Ville</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Compte</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Actions</th>
                 </tr>
               </thead>
@@ -182,9 +230,21 @@ const Clients = () => {
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">{client.email_client}</td>
                     <td className="px-4 py-3 text-sm">{client.telephone_client || '-'}</td>
-                    <td className="px-4 py-3 text-sm">{client.ville_client || '-'}</td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
+                      {client.id_utilisateur ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                          <UserCheck className="w-3 h-3" />
+                          Actif
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs font-semibold">
+                          <UserX className="w-3 h-3" />
+                          Aucun
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
                         <button
                           onClick={() => { setSelectedClient(client); setShowModal(true); }}
                           className="p-2 text-bleu-royal hover:bg-bleu-ciel rounded-btn"
@@ -199,6 +259,15 @@ const Clients = () => {
                         >
                           <Edit className="w-4 h-4" />
                         </button>
+                        {client.id_utilisateur && (
+                          <button
+                            onClick={() => handleResetPassword(client)}
+                            className="p-2 text-purple-600 hover:bg-purple-50 rounded-btn"
+                            title="Réinitialiser mot de passe"
+                          >
+                            <RefreshCw className="w-4 h-4" />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleDelete(client.id_client)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-btn"
@@ -229,6 +298,22 @@ const Clients = () => {
               </button>
             </div>
             <div className="p-6 space-y-4">
+              {/* Statut compte */}
+              <div className="flex items-center justify-between p-3 rounded-btn bg-blanc-casse">
+                <span className="text-sm text-gray-600">Statut du compte</span>
+                {selectedClient.id_utilisateur ? (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                    <UserCheck className="w-4 h-4" />
+                    Compte actif
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm font-semibold">
+                    <UserX className="w-4 h-4" />
+                    Pas de compte
+                  </span>
+                )}
+              </div>
+
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-gray-400" />
@@ -250,13 +335,22 @@ const Clients = () => {
                   {selectedClient.code_postal_client} {selectedClient.ville_client}
                 </p>
               </div>
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-wrap gap-3 pt-4 border-t">
                 <button
                   onClick={() => { setShowModal(false); handleEdit(selectedClient); }}
                   className="btn-primary flex-1"
                 >
                   Modifier
                 </button>
+                {selectedClient.id_utilisateur && (
+                  <button
+                    onClick={() => { handleResetPassword(selectedClient); }}
+                    className="btn-secondary flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Reset MDP
+                  </button>
+                )}
                 <Link
                   to={`/admin/evenements?client=${selectedClient.id_client}`}
                   className="btn-secondary flex-1 text-center"
@@ -283,6 +377,16 @@ const Clients = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {/* Note pour création */}
+              {!selectedClient && (
+                <div className="bg-blue-50 border border-blue-200 rounded-btn p-4">
+                  <p className="text-sm text-blue-700">
+                    <strong>📧 Note :</strong> Un compte utilisateur sera automatiquement créé pour ce client. 
+                    Un email avec les identifiants de connexion lui sera envoyé.
+                  </p>
+                </div>
+              )}
+
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <label className="label">Nom de l'entreprise *</label>
@@ -323,6 +427,9 @@ const Clients = () => {
                     onChange={(e) => setFormData({...formData, email_client: e.target.value})}
                     required
                   />
+                  {!selectedClient && (
+                    <p className="text-xs text-gray-500 mt-1">Cet email sera utilisé pour la connexion</p>
+                  )}
                 </div>
                 <div>
                   <label className="label">Téléphone</label>
@@ -367,7 +474,7 @@ const Clients = () => {
                   Annuler
                 </button>
                 <button type="submit" disabled={saving} className={`btn-primary flex-1 ${saving ? 'opacity-50' : ''}`}>
-                  {saving ? 'Enregistrement...' : selectedClient ? 'Modifier' : 'Créer'}
+                  {saving ? 'Enregistrement...' : selectedClient ? 'Modifier' : 'Créer le client'}
                 </button>
               </div>
             </form>

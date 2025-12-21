@@ -13,6 +13,7 @@ router.post('/login', validateLogin, AuthController.login);
 router.post('/register', validateRegister, AuthController.register);
 router.post('/forgot-password', AuthController.forgotPassword);
 router.post('/change-password', authenticate, validatePasswordChange, AuthController.changePassword);
+router.post('/logout', authenticate, AuthController.logout);
 router.get('/me', authenticate, AuthController.getMe);
 
 module.exports = router;

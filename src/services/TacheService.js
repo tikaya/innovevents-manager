@@ -31,8 +31,11 @@ class TacheService {
     }
 
     static async create(data) {
-        const evt = await Evenement.findById(data.id_evenement);
-        if (!evt) throw new Error('Événement non trouvé');
+        // Vérifier l'événement seulement si fourni
+        if (data.id_evenement) {
+            const evt = await Evenement.findById(data.id_evenement);
+            if (!evt) throw new Error('Événement non trouvé');
+        }
 
         const user = await Utilisateur.findById(data.id_utilisateur);
         if (!user) throw new Error('Utilisateur non trouvé');
@@ -50,6 +53,13 @@ class TacheService {
                 throw new Error('Assignation employés uniquement');
             }
         }
+        
+        // Vérifier l'événement seulement si fourni
+        if (data.id_evenement) {
+            const evt = await Evenement.findById(data.id_evenement);
+            if (!evt) throw new Error('Événement non trouvé');
+        }
+        
         const tache = await Tache.update(id, data);
         if (!tache) throw new Error('Tâche non trouvée');
         return tache;
