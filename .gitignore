@@ -2,3 +2,6 @@ node_modules/
 .env
 *.log
 .DS_Store
+# Fichiers avec credentials en dur (anciens)
+fix-password.js
+*.local.js

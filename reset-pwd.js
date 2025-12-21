@@ -1,22 +1,50 @@
-const bcrypt = require('bcrypt');
+/**
+ * Script de réinitialisation de mot de passe
+ * Utilise les variables d'environnement du fichier .env
+ */
+require('dotenv').config();
+const bcrypt = require('bcryptjs');
 const { Pool } = require('pg');
 
+// Utilisation des variables d'environnement
 const pool = new Pool({
-  user: 'postgres',
-  password: 'postgres',
-  database: 'innovevents',
-  host: 'localhost'
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 5432
 });
 
-const hash = bcrypt.hashSync('Client123', 10);
+async function resetPassword(email, newPassword) {
+  if (!email || !newPassword) {
+    console.error('Usage: node reset-pwd.js <email> <nouveau_mot_de_passe>');
+    process.exit(1);
+  }
 
-pool.query(
-  "UPDATE utilisateurs SET mot_de_passe = $1 WHERE email = 'tikaya1999+client@gmail.com'",
-  [hash]
-).then(() => {
-  console.log('Mot de passe mis à jour!');
-  pool.end();
-}).catch(err => {
-  console.error('Erreur:', err);
-  pool.end();
-});
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(newPassword, salt);
+    
+    const result = await pool.query(
+      "UPDATE utilisateur SET mot_de_passe = $1, doit_changer_mdp = true WHERE email = $2 RETURNING email",
+      [hash, email]
+    );
+    
+    if (result.rows.length === 0) {
+      console.log('❌ Aucun utilisateur trouvé avec cet email:', email);
+    } else {
+      console.log('✅ Mot de passe réinitialisé pour:', result.rows[0].email);
+      console.log('⚠️  L\'utilisateur devra changer son mot de passe à la prochaine connexion');
+    }
+  } catch (error) {
+    console.error('❌ Erreur:', error.message);
+  } finally {
+    pool.end();
+  }
+}
+
+// Récupérer les arguments de la ligne de commande
+const email = process.argv[2];
+const newPassword = process.argv[3];
+
+resetPassword(email, newPassword);
