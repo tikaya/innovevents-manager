@@ -8,11 +8,11 @@ const { Pool } = require('pg');
 
 // Utilisation des variables d'environnement
 const pool = new Pool({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.POSTGRES_DB,
+  host: process.env.POSTGRES_HOST || 'localhost',
+  port: process.env.POSTGRES_PORT || 5432
 });
 
 async function resetPassword(email, newPassword) {
