@@ -1,69 +1,92 @@
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gris-ardoise text-white">
+    <footer className="bg-bleu-royal text-white" role="contentinfo">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-4 gap-8">
           {/* Logo & Description */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <span className="text-or text-2xl">✦</span>
+          <div className="md:col-span-2">
+            <Link to="/" className="flex items-center space-x-2 mb-4" aria-label="Innov'Events - Accueil">
+              <span className="text-or text-2xl" aria-hidden="true">✦</span>
               <span className="font-montserrat font-bold text-xl">
                 Innov'<span className="text-or">Events</span>
               </span>
-            </div>
-            <p className="text-gray-400 text-sm">
-              Créateurs d'événements exceptionnels depuis 2020.
+            </Link>
+            <p className="text-blue-200 mb-4">
+              Votre partenaire pour des événements d'entreprise uniques et mémorables.
+              Nous transformons vos idées en expériences exceptionnelles.
             </p>
           </div>
 
-          {/* Liens rapides */}
-          <div>
-            <h4 className="font-montserrat font-semibold text-or mb-4">Liens rapides</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li><Link to="/" className="hover:text-white transition-colors">Accueil</Link></li>
-              <li><Link to="/evenements" className="hover:text-white transition-colors">Événements</Link></li>
-              <li><Link to="/avis" className="hover:text-white transition-colors">Avis clients</Link></li>
-              <li><Link to="/demande-devis" className="hover:text-white transition-colors">Demander un devis</Link></li>
+          {/* Navigation */}
+          <nav aria-label="Navigation du pied de page">
+            <h2 className="font-montserrat font-bold text-lg mb-4">Navigation</h2>
+            <ul className="space-y-2" role="list">
+              <li>
+                <Link to="/" className="text-blue-200 hover:text-or transition-colors">
+                  Accueil
+                </Link>
+              </li>
+              <li>
+                <Link to="/evenements" className="text-blue-200 hover:text-or transition-colors">
+                  Événements
+                </Link>
+              </li>
+              <li>
+                <Link to="/avis" className="text-blue-200 hover:text-or transition-colors">
+                  Avis clients
+                </Link>
+              </li>
+              <li>
+                <Link to="/demande-devis" className="text-blue-200 hover:text-or transition-colors">
+                  Demander un devis
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-blue-200 hover:text-or transition-colors">
+                  Contact
+                </Link>
+              </li>
             </ul>
-          </div>
-
-          {/* Nos services */}
-          <div>
-            <h4 className="font-montserrat font-semibold text-or mb-4">Nos services</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li>Séminaires</li>
-              <li>Conférences</li>
-              <li>Soirées d'entreprise</li>
-              <li>Team building</li>
-            </ul>
-          </div>
+          </nav>
 
           {/* Contact */}
           <div>
-            <h4 className="font-montserrat font-semibold text-or mb-4">Contact</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li className="flex items-center space-x-2">
-                <Mail size={16} />
-                <span>contact@innovevents.com</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Phone size={16} />
-                <span>01 23 45 67 89</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <MapPin size={16} />
-                <span>Paris, France</span>
-              </li>
-            </ul>
+            <h2 className="font-montserrat font-bold text-lg mb-4">Contact</h2>
+            <address className="not-italic space-y-3">
+              <p className="flex items-center gap-2 text-blue-200">
+                <MapPin className="w-5 h-5 text-or flex-shrink-0" aria-hidden="true" />
+                <span>123 Avenue des Événements<br />75001 Paris</span>
+              </p>
+              <p className="flex items-center gap-2 text-blue-200">
+                <Phone className="w-5 h-5 text-or flex-shrink-0" aria-hidden="true" />
+                <a href="tel:+33123456789" className="hover:text-or transition-colors">
+                  01 23 45 67 89
+                </a>
+              </p>
+              <p className="flex items-center gap-2 text-blue-200">
+                <Mail className="w-5 h-5 text-or flex-shrink-0" aria-hidden="true" />
+                <a href="mailto:contact@innovevents.com" className="hover:text-or transition-colors">
+                  contact@innovevents.com
+                </a>
+              </p>
+            </address>
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>© 2024 Innov'Events - Tous droits réservés - <Link to="/mentions-legales" className="hover:text-white">Mentions légales</Link></p>
+        {/* Bottom */}
+        <div className="border-t border-blue-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-blue-200 text-sm">
+            © {new Date().getFullYear()} Innov'Events. Tous droits réservés.
+          </p>
+          <Link 
+            to="/mentions-legales" 
+            className="text-blue-200 hover:text-or transition-colors text-sm"
+          >
+            Mentions légales & RGPD
+          </Link>
         </div>
       </div>
     </footer>

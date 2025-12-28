@@ -1,179 +1,199 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const Connexion = () => {
+  const [formData, setFormData] = useState({ email: '', mot_de_passe: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+  const [errors, setErrors] = useState({});
   const { login } = useAuth();
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = async (data) => {
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email) {
+      newErrors.email = 'L\'email est requis';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email invalide';
+    }
+    if (!formData.mot_de_passe) {
+      newErrors.mot_de_passe = 'Le mot de passe est requis';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
     setLoading(true);
-    setError('');
-
     try {
-      const response = await login(data.email, data.mot_de_passe);
+      const result = await login(formData.email, formData.mot_de_passe);
+      toast.success('Connexion réussie !');
       
-      // Vérifier si l'utilisateur doit changer son mot de passe
-      if (response.doit_changer_mdp) {
+      if (result.doit_changer_mdp) {
         navigate('/changer-mot-de-passe');
-        return;
-      }
-      
-      const role = response.data?.user?.role;
-      
-      if (role === 'admin') {
-        navigate('/admin');
-      } else if (role === 'employe') {
-        navigate('/employe');
-      } else if (role === 'client') {
-        navigate('/client');
       } else {
-        navigate('/');
+        const role = result.data?.user?.role;
+        switch (role) {
+          case 'admin': navigate('/admin'); break;
+          case 'employe': navigate('/employe'); break;
+          case 'client': navigate('/client'); break;
+          default: navigate('/');
+        }
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Email ou mot de passe incorrect');
+      toast.error(err.response?.data?.message || 'Erreur de connexion');
+      setErrors({ general: 'Email ou mot de passe incorrect' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bleu-royal via-blue-800 to-bleu-royal flex items-center justify-center px-4 py-12">
-      {/* Background decoration */}
-      <div className="absolute inset-0 opacity-10 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-or rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-bleu-ciel rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2">
-            <span className="text-or text-3xl">✦</span>
-            <span className="font-montserrat font-bold text-2xl text-white">
-              Innov'<span className="text-or">Events</span>
-            </span>
-          </Link>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-bleu-royal to-blue-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Retour */}
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-8 transition-colors"
+          aria-label="Retour à l'accueil"
+        >
+          <ArrowLeft className="w-5 h-5" aria-hidden="true" />
+          Retour à l'accueil
+        </Link>
 
         {/* Card */}
-        <div className="bg-white rounded-card shadow-2xl p-8">
+        <div className="bg-white rounded-card shadow-xl p-8">
+          {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-montserrat font-bold text-gris-ardoise mb-2">
+            <Link to="/" className="inline-flex items-center gap-2 mb-4" aria-label="Innov'Events">
+              <span className="text-or text-3xl" aria-hidden="true">✦</span>
+              <span className="font-montserrat font-bold text-2xl text-bleu-royal">
+                Innov'<span className="text-or">Events</span>
+              </span>
+            </Link>
+            <h1 className="text-2xl font-montserrat font-bold text-gris-ardoise">
               Connexion
             </h1>
-            <p className="text-gray-500">
+            <p className="text-gray-500 mt-2">
               Accédez à votre espace personnel
             </p>
           </div>
 
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-r-btn mb-6">
-              {error}
+          {/* Erreur générale */}
+          {errors.general && (
+            <div 
+              className="bg-red-50 text-red-600 p-4 rounded-btn mb-6 text-center"
+              role="alert"
+              aria-live="polite"
+            >
+              {errors.general}
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Formulaire */}
+          <form onSubmit={handleSubmit} noValidate>
             {/* Email */}
-            <div>
-              <label className="label">Adresse email</label>
+            <div className="mb-4">
+              <label htmlFor="email" className="label">
+                Adresse email
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" aria-hidden="true" />
                 <input
                   type="email"
+                  id="email"
+                  name="email"
+                  autoComplete="email"
                   className={`input-field pl-10 ${errors.email ? 'border-red-500' : ''}`}
-                  placeholder="exemple@email.com"
-                  {...register('email', {
-                    required: 'Ce champ est requis',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Email invalide'
-                    }
-                  })}
+                  placeholder="vous@exemple.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  aria-required="true"
+                  aria-invalid={errors.email ? 'true' : 'false'}
+                  aria-describedby={errors.email ? 'email-error' : undefined}
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                <p id="email-error" className="text-red-500 text-sm mt-1" role="alert">
+                  {errors.email}
+                </p>
               )}
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="label">Mot de passe</label>
+            {/* Mot de passe */}
+            <div className="mb-6">
+              <label htmlFor="mot_de_passe" className="label">
+                Mot de passe
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" aria-hidden="true" />
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  id="mot_de_passe"
+                  name="mot_de_passe"
+                  autoComplete="current-password"
                   className={`input-field pl-10 pr-10 ${errors.mot_de_passe ? 'border-red-500' : ''}`}
                   placeholder="••••••••"
-                  {...register('mot_de_passe', { required: 'Ce champ est requis' })}
+                  value={formData.mot_de_passe}
+                  onChange={(e) => setFormData({ ...formData, mot_de_passe: e.target.value })}
+                  aria-required="true"
+                  aria-invalid={errors.mot_de_passe ? 'true' : 'false'}
+                  aria-describedby={errors.mot_de_passe ? 'password-error' : undefined}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" aria-hidden="true" />
+                  ) : (
+                    <Eye className="w-5 h-5" aria-hidden="true" />
+                  )}
                 </button>
               </div>
               {errors.mot_de_passe && (
-                <p className="text-red-500 text-sm mt-1">{errors.mot_de_passe.message}</p>
+                <p id="password-error" className="text-red-500 text-sm mt-1" role="alert">
+                  {errors.mot_de_passe}
+                </p>
               )}
             </div>
 
-            {/* Forgot password */}
-            <div className="text-right">
-              <Link to="/mot-de-passe-oublie" className="text-sm text-bleu-royal hover:text-or transition-colors">
+            {/* Mot de passe oublié */}
+            <div className="text-right mb-6">
+              <Link 
+                to="/mot-de-passe-oublie" 
+                className="text-sm text-bleu-royal hover:text-or transition-colors"
+              >
                 Mot de passe oublié ?
               </Link>
             </div>
 
-            {/* Submit */}
+            {/* Bouton submit */}
             <button
               type="submit"
               disabled={loading}
-              className={`btn-primary w-full flex items-center justify-center ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full btn-primary ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              aria-busy={loading}
             >
-              {loading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Connexion...
-                </>
-              ) : (
-                <>
-                  <LogIn className="w-5 h-5 mr-2" />
-                  Se connecter
-                </>
-              )}
+              {loading ? 'Connexion en cours...' : 'Se connecter'}
             </button>
           </form>
 
-          {/* Register link */}
-          <div className="mt-8 pt-6 border-t text-center">
-            <p className="text-gray-500">
-              Pas encore de compte ?{' '}
-              <Link to="/inscription" className="text-bleu-royal font-semibold hover:text-or transition-colors">
-                Créer un compte
-              </Link>
-            </p>
-          </div>
-        </div>
-
-        {/* Back to home */}
-        <div className="text-center mt-6">
-          <Link to="/" className="text-blue-200 hover:text-white transition-colors text-sm">
-            ← Retour à l'accueil
-          </Link>
+          {/* Inscription */}
+          <p className="text-center mt-6 text-gray-500">
+            Pas encore de compte ?{' '}
+            <Link to="/inscription" className="text-bleu-royal hover:text-or font-semibold transition-colors">
+              S'inscrire
+            </Link>
+          </p>
         </div>
       </div>
     </div>
