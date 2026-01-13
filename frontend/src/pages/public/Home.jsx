@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Mic, Users, PartyPopper, ArrowRight, Star, Calendar, MapPin, CheckCircle } from 'lucide-react';
+import { Mic, Users, PartyPopper, ArrowRight, Star, Calendar, CheckCircle } from 'lucide-react';
 import api from '../../services/api';
 
 const Home = () => {
@@ -16,15 +16,11 @@ const Home = () => {
     try {
       const response = await api.get('/evenements/public');
       const evenements = response.data.data || [];
-      
-      // Trouver le prochain événement (date >= aujourd'hui)
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
       const futurs = evenements
         .filter(e => new Date(e.date_debut) >= today)
         .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut));
-      
       if (futurs.length > 0) {
         setProchainEvenement(futurs[0]);
       }
@@ -55,19 +51,22 @@ const Home = () => {
       icon: <Mic className="w-8 h-8" />,
       title: 'Séminaires',
       description: 'Organisation complète de vos séminaires d\'entreprise, de la conception à la réalisation.',
-      features: ['Lieu sur mesure', 'Restauration', 'Équipements techniques']
+      features: ['Lieu sur mesure', 'Restauration', 'Équipements techniques'],
+      image: '/images/seminaire.jpg'
     },
     {
       icon: <Users className="w-8 h-8" />,
       title: 'Conférences',
       description: 'Mise en place d\'événements professionnels impactants pour valoriser votre expertise.',
-      features: ['Gestion des intervenants', 'Streaming live', 'Networking']
+      features: ['Gestion des intervenants', 'Streaming live', 'Networking'],
+      image: '/images/conference.jpg'
     },
     {
       icon: <PartyPopper className="w-8 h-8" />,
       title: 'Soirées',
       description: 'Création de soirées d\'entreprise mémorables pour célébrer vos succès en grand.',
-      features: ['Animation', 'Décoration thématique', 'Traiteur gastronomique']
+      features: ['Animation', 'Décoration thématique', 'Traiteur gastronomique'],
+      image: '/images/soiree.jpg'
     },
   ];
 
@@ -139,15 +138,17 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Hero Image/Card - Dynamique */}
+            {/* Hero Image */}
             <div className="hidden md:block">
               <div className="relative">
-                <div className="bg-white rounded-card shadow-2xl p-6 transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                  <div className="bg-bleu-ciel rounded-lg h-48 mb-4 flex items-center justify-center">
-                    <Calendar className="w-16 h-16 text-bleu-royal/30" />
-                  </div>
+                <div className="bg-white rounded-card shadow-2xl p-4 transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                  <img 
+                    src="/images/hero-event.jpg" 
+                    alt="Événement corporate organisé par Innov'Events - Conférence professionnelle" 
+                    className="rounded-lg w-full h-64 object-cover"
+                  />
                   {prochainEvenement ? (
-                    <>
+                    <div className="mt-4">
                       <h3 className="font-montserrat font-bold text-gris-ardoise">Prochain événement</h3>
                       <p className="text-gray-500 text-sm">
                         {prochainEvenement.nom_evenement} - {formatDate(prochainEvenement.date_debut)}
@@ -155,12 +156,12 @@ const Home = () => {
                       <p className="text-xs text-bleu-royal mt-1">
                         {prochainEvenement.type_evenement}
                       </p>
-                    </>
+                    </div>
                   ) : (
-                    <>
+                    <div className="mt-4">
                       <h3 className="font-montserrat font-bold text-gris-ardoise">Votre événement</h3>
                       <p className="text-gray-500 text-sm">Contactez-nous pour organiser le vôtre !</p>
-                    </>
+                    </div>
                   )}
                 </div>
                 <div className="absolute -bottom-4 -left-4 bg-or text-bleu-royal rounded-card p-4 shadow-lg">
@@ -200,7 +201,11 @@ const Home = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="order-2 md:order-1">
               <div className="relative">
-                <div className="bg-bleu-ciel rounded-card h-80 w-full"></div>
+                <img 
+                  src="/images/team.jpg" 
+                  alt="L'équipe Innov'Events en réunion de travail" 
+                  className="rounded-card w-full h-80 object-cover shadow-lg"
+                />
                 <div className="absolute -bottom-6 -right-6 bg-bleu-royal rounded-card p-6 text-white">
                   <p className="font-montserrat font-bold text-2xl">5+</p>
                   <p className="text-blue-200 text-sm">Années d'expertise</p>
@@ -247,32 +252,42 @@ const Home = () => {
             {services.map((service, index) => (
               <div 
                 key={index} 
-                className="group bg-blanc-casse rounded-card p-8 hover:bg-bleu-royal hover:shadow-xl transition-all duration-300"
+                className="group bg-blanc-casse rounded-card overflow-hidden hover:shadow-xl transition-all duration-300"
               >
-                <div className="bg-bleu-ciel w-16 h-16 rounded-full flex items-center justify-center mb-6 text-bleu-royal group-hover:bg-or group-hover:text-bleu-royal transition-colors">
-                  {service.icon}
+                <div className="relative h-48 overflow-hidden">
+                  <img 
+                    src={service.image} 
+                    alt={`Service ${service.title} - Innov'Events`}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 bg-or w-12 h-12 rounded-full flex items-center justify-center text-bleu-royal">
+                    {service.icon}
+                  </div>
                 </div>
-                <h3 className="font-montserrat font-bold text-xl text-gris-ardoise mb-3 group-hover:text-white transition-colors">
-                  {service.title}
-                </h3>
-                <p className="text-gray-600 mb-6 group-hover:text-blue-100 transition-colors">
-                  {service.description}
-                </p>
-                <ul className="space-y-2 mb-6">
-                  {service.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-500 group-hover:text-blue-200 transition-colors">
-                      <CheckCircle className="w-4 h-4 text-or" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Link 
-                  to="/demande-devis" 
-                  className="inline-flex items-center text-bleu-royal font-semibold group-hover:text-or transition-colors"
-                >
-                  En savoir plus
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Link>
+                <div className="p-6">
+                  <h3 className="font-montserrat font-bold text-xl text-gris-ardoise mb-3">
+                    {service.title}
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {service.description}
+                  </p>
+                  <ul className="space-y-2 mb-6">
+                    {service.features.map((feature, i) => (
+                      <li key={i} className="flex items-center gap-2 text-sm text-gray-500">
+                        <CheckCircle className="w-4 h-4 text-or" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link 
+                    to="/demande-devis" 
+                    className="inline-flex items-center text-bleu-royal font-semibold hover:text-or transition-colors"
+                  >
+                    Demander un devis
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

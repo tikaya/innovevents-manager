@@ -43,17 +43,6 @@
     "jest": "^30.2.0",
     "nodemon": "^3.1.11",
     "supertest": "^7.1.4"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "coverageDirectory": "coverage",
-    "collectCoverageFrom": [
-      "src/**/*.js",
-      "!src/index.js",
-      "!src/app.js"
-    ],
-    "testMatch": [
-      "**/tests/**/*.test.js"
-    ]
   }
+  
 }
