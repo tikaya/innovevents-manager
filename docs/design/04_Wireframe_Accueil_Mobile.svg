@@ -1,0 +1,131 @@
+<svg width="375" height="2400" viewBox="0 0 375 2400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- STATUS BAR -->
+  <rect x="0" y="0" width="375" height="44" fill="#333333"/>
+  <text x="187" y="28" font-family="Arial" font-size="12" fill="#FFFFFF" text-anchor="middle">9:41</text>
+
+  <!-- HEADER -->
+  <rect x="0" y="44" width="375" height="56" fill="#FFFFFF" stroke="#E0E0E0"/>
+  <rect x="20" y="58" width="120" height="28" fill="#F0F0F0" stroke="#CCCCCC"/>
+  <text x="80" y="77" font-family="Arial" font-size="10" fill="#555555" text-anchor="middle">Logo</text>
+  <rect x="320" y="60" width="35" height="28" rx="4" fill="#F0F0F0" stroke="#CCCCCC"/>
+  <text x="337" y="78" font-family="Arial" font-size="14" fill="#555555" text-anchor="middle">☰</text>
+
+  <!-- HERO SECTION -->
+  <rect x="0" y="100" width="375" height="520" fill="#E0E0E0" stroke="#CCCCCC"/>
+  
+  <!-- Hero Image -->
+  <rect x="20" y="120" width="335" height="180" rx="8" fill="#D0D0D0" stroke="#BBBBBB"/>
+  <line x1="20" y1="120" x2="355" y2="300" stroke="#BBBBBB" stroke-width="1"/>
+  <line x1="355" y1="120" x2="20" y2="300" stroke="#BBBBBB" stroke-width="1"/>
+  <text x="187" y="220" font-family="Arial" font-size="11" fill="#888888" text-anchor="middle">IMAGE HERO</text>
+  
+  <!-- Title -->
+  <rect x="20" y="330" width="280" height="22" fill="#C0C0C0"/>
+  <rect x="20" y="358" width="250" height="22" fill="#C0C0C0"/>
+  <rect x="20" y="386" width="200" height="22" fill="#B0B0B0"/>
+  <text x="20" y="430" font-family="Arial" font-size="10" fill="#666666">Titre principal</text>
+  
+  <rect x="20" y="445" width="300" height="10" fill="#D8D8D8"/>
+  <rect x="20" y="462" width="280" height="10" fill="#D8D8D8"/>
+  <text x="20" y="490" font-family="Arial" font-size="9" fill="#888888">Description</text>
+  
+  <!-- CTA Button -->
+  <rect x="20" y="510" width="335" height="50" rx="25" fill="#555555"/>
+  <text x="187" y="540" font-family="Arial" font-size="11" fill="#FFFFFF" text-anchor="middle">Bouton CTA Principal</text>
+  
+  <rect x="20" y="580" width="335" height="1" fill="#AAAAAA"/>
+  <text x="187" y="605" font-family="Arial" font-size="9" fill="#888888" text-anchor="middle">Trust: +200 clients</text>
+
+  <!-- QUI SOMMES-NOUS -->
+  <rect x="0" y="620" width="375" height="380" fill="#F5F5F5" stroke="#E0E0E0"/>
+  
+  <rect x="100" y="660" width="175" height="20" fill="#C0C0C0"/>
+  <text x="187" y="700" font-family="Arial" font-size="11" fill="#555555" text-anchor="middle">Titre: Qui sommes-nous ?</text>
+  <rect x="147" y="710" width="81" height="3" fill="#999999"/>
+  
+  <rect x="25" y="740" width="325" height="10" fill="#E0E0E0"/>
+  <rect x="25" y="758" width="300" height="10" fill="#E0E0E0"/>
+  <rect x="25" y="776" width="280" height="10" fill="#E0E0E0"/>
+  <text x="25" y="805" font-family="Arial" font-size="9" fill="#888888">Paragraphe description</text>
+  
+  <rect x="35" y="820" width="200" height="12" fill="#E8E8E8"/>
+  <rect x="35" y="840" width="180" height="12" fill="#E8E8E8"/>
+  <rect x="35" y="860" width="160" height="12" fill="#E8E8E8"/>
+  <rect x="35" y="880" width="170" height="12" fill="#E8E8E8"/>
+  <text x="35" y="910" font-family="Arial" font-size="9" fill="#888888">Liste avantages</text>
+  
+  <rect x="87" y="930" width="200" height="45" rx="4" fill="#555555"/>
+  <text x="187" y="958" font-family="Arial" font-size="10" fill="#FFFFFF" text-anchor="middle">Bouton CTA</text>
+
+  <!-- NOS SERVICES -->
+  <rect x="0" y="1000" width="375" height="680" fill="#FFFFFF" stroke="#E0E0E0"/>
+  
+  <rect x="115" y="1040" width="145" height="20" fill="#C0C0C0"/>
+  <text x="187" y="1080" font-family="Arial" font-size="11" fill="#555555" text-anchor="middle">Titre: Nos Services</text>
+  <rect x="152" y="1090" width="71" height="3" fill="#999999"/>
+
+  <!-- Service Cards -->
+  <rect x="20" y="1120" width="335" height="170" rx="8" fill="#F5F5F5" stroke="#E0E0E0"/>
+  <circle cx="65" cy="1170" r="28" fill="#D0D0D0" stroke="#BBBBBB"/>
+  <text x="65" y="1175" font-family="Arial" font-size="8" fill="#666666" text-anchor="middle">ICON</text>
+  <rect x="110" y="1155" width="120" height="14" fill="#C0C0C0"/>
+  <text x="110" y="1190" font-family="Arial" font-size="10" fill="#555555">Séminaires</text>
+  <rect x="110" y="1200" width="220" height="8" fill="#E0E0E0"/>
+  <rect x="110" y="1215" width="200" height="8" fill="#E0E0E0"/>
+  <rect x="40" y="1250" width="150" height="8" fill="#E8E8E8"/>
+  <text x="40" y="1275" font-family="Arial" font-size="8" fill="#888888">Liste + Lien</text>
+
+  <rect x="20" y="1310" width="335" height="170" rx="8" fill="#F5F5F5" stroke="#E0E0E0"/>
+  <circle cx="65" cy="1360" r="28" fill="#D0D0D0" stroke="#BBBBBB"/>
+  <text x="65" y="1365" font-family="Arial" font-size="8" fill="#666666" text-anchor="middle">ICON</text>
+  <rect x="110" y="1345" width="120" height="14" fill="#C0C0C0"/>
+  <text x="110" y="1380" font-family="Arial" font-size="10" fill="#555555">Conférences</text>
+  <rect x="110" y="1390" width="220" height="8" fill="#E0E0E0"/>
+  <rect x="110" y="1405" width="200" height="8" fill="#E0E0E0"/>
+  <rect x="40" y="1440" width="150" height="8" fill="#E8E8E8"/>
+  <text x="40" y="1465" font-family="Arial" font-size="8" fill="#888888">Liste + Lien</text>
+
+  <rect x="20" y="1500" width="335" height="170" rx="8" fill="#F5F5F5" stroke="#E0E0E0"/>
+  <circle cx="65" cy="1550" r="28" fill="#D0D0D0" stroke="#BBBBBB"/>
+  <text x="65" y="1555" font-family="Arial" font-size="8" fill="#666666" text-anchor="middle">ICON</text>
+  <rect x="110" y="1535" width="120" height="14" fill="#C0C0C0"/>
+  <text x="110" y="1570" font-family="Arial" font-size="10" fill="#555555">Soirées</text>
+  <rect x="110" y="1580" width="220" height="8" fill="#E0E0E0"/>
+  <rect x="110" y="1595" width="200" height="8" fill="#E0E0E0"/>
+  <rect x="40" y="1630" width="150" height="8" fill="#E8E8E8"/>
+  <text x="40" y="1655" font-family="Arial" font-size="8" fill="#888888">Liste + Lien</text>
+
+  <!-- CTA SECTION -->
+  <rect x="0" y="1680" width="375" height="200" fill="#555555"/>
+  
+  <rect x="60" y="1720" width="255" height="18" fill="#444444"/>
+  <rect x="80" y="1745" width="215" height="18" fill="#444444"/>
+  <text x="187" y="1785" font-family="Arial" font-size="10" fill="#CCCCCC" text-anchor="middle">Titre CTA</text>
+  
+  <rect x="60" y="1800" width="255" height="10" fill="#666666"/>
+  <text x="187" y="1830" font-family="Arial" font-size="9" fill="#AAAAAA" text-anchor="middle">Description</text>
+  
+  <rect x="60" y="1845" width="255" height="50" rx="25" fill="#888888"/>
+  <text x="187" y="1875" font-family="Arial" font-size="11" fill="#FFFFFF" text-anchor="middle">Bouton CTA</text>
+
+  <!-- FOOTER -->
+  <rect x="0" y="1880" width="375" height="280" fill="#333333"/>
+  
+  <rect x="130" y="1920" width="115" height="16" fill="#555555"/>
+  <text x="187" y="1960" font-family="Arial" font-size="10" fill="#AAAAAA" text-anchor="middle">Logo</text>
+  <rect x="100" y="1975" width="175" height="8" fill="#444444"/>
+  <text x="187" y="2005" font-family="Arial" font-size="9" fill="#777777" text-anchor="middle">Slogan</text>
+  
+  <!-- Social Icons -->
+  <circle cx="147" cy="2050" r="18" fill="#444444"/>
+  <circle cx="187" cy="2050" r="18" fill="#444444"/>
+  <circle cx="227" cy="2050" r="18" fill="#444444"/>
+  <text x="187" y="2090" font-family="Arial" font-size="8" fill="#666666" text-anchor="middle">Réseaux sociaux</text>
+  
+  <rect x="115" y="2110" width="145" height="8" fill="#444444"/>
+  <rect x="130" y="2128" width="115" height="8" fill="#444444"/>
+  <text x="187" y="2155" font-family="Arial" font-size="8" fill="#666666" text-anchor="middle">Contact info</text>
+  
+  <rect x="0" y="2170" width="375" height="40" fill="#222222"/>
+  <text x="187" y="2195" font-family="Arial" font-size="8" fill="#555555" text-anchor="middle">© 2026 Innov'Events</text>
+</svg>

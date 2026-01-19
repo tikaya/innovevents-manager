@@ -1,0 +1,54 @@
+<svg width="375" height="1800" viewBox="0 0 375 1800" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="375" height="1800" fill="#F5F5F5"/>
+<rect x="0" y="0" width="375" height="44" fill="#555555"/>
+<text x="187" y="28" font-family="Arial" font-size="12" fill="#FFFFFF" text-anchor="middle">9:41</text>
+<rect x="0" y="44" width="375" height="56" fill="#FFFFFF" stroke="#CCCCCC"/>
+<rect x="20" y="58" width="100" height="28" fill="#E0E0E0"/>
+<text x="70" y="76" font-family="Arial" font-size="10" fill="#666666" text-anchor="middle">LOGO</text>
+<rect x="320" y="60" width="35" height="24" fill="#E0E0E0"/>
+<text x="337" y="76" font-family="Arial" font-size="12" fill="#666666" text-anchor="middle">☰</text>
+<rect x="0" y="100" width="375" height="120" fill="#E0E0E0" stroke="#CCCCCC"/>
+<rect x="130" y="115" width="115" height="12" fill="#CCCCCC"/>
+<text x="187" y="150" font-family="Arial" font-size="10" fill="#888888" text-anchor="middle">LABEL</text>
+<rect x="70" y="160" width="235" height="20" fill="#AAAAAA"/>
+<text x="187" y="200" font-family="Arial" font-size="10" fill="#666666" text-anchor="middle">TITRE PAGE</text>
+<rect x="15" y="235" width="345" height="1115" fill="#FFFFFF" stroke="#CCCCCC" rx="8"/>
+<rect x="60" y="260" width="255" height="24" fill="#F0F0F0"/>
+<text x="187" y="277" font-family="Arial" font-size="9" fill="#888888" text-anchor="middle">PROGRESSION</text>
+<rect x="35" y="305" width="120" height="14" fill="#CCCCCC"/>
+<text x="95" y="340" font-family="Arial" font-size="9" fill="#666666" text-anchor="middle">SECTION ENTREPRISE</text>
+<rect x="35" y="355" width="305" height="45" fill="#F8F8F8" stroke="#E0E0E0"/>
+<rect x="35" y="425" width="120" height="14" fill="#CCCCCC"/>
+<text x="95" y="460" font-family="Arial" font-size="9" fill="#666666" text-anchor="middle">SECTION CONTACT</text>
+<rect x="35" y="475" width="305" height="45" fill="#F8F8F8" stroke="#E0E0E0"/>
+<rect x="35" y="530" width="305" height="45" fill="#F8F8F8" stroke="#E0E0E0"/>
+<rect x="35" y="585" width="305" height="45" fill="#F8F8F8" stroke="#E0E0E0"/>
+<rect x="35" y="640" width="305" height="45" fill="#F8F8F8" stroke="#E0E0E0"/>
+<rect x="35" y="710" width="120" height="14" fill="#CCCCCC"/>
+<text x="95" y="745" font-family="Arial" font-size="9" fill="#666666" text-anchor="middle">SECTION EVENEMENT</text>
+<rect x="35" y="760" width="305" height="45" fill="#F8F8F8" stroke="#E0E0E0"/>
+<rect x="35" y="815" width="305" height="45" fill="#F8F8F8" stroke="#E0E0E0"/>
+<rect x="35" y="870" width="305" height="45" fill="#F8F8F8" stroke="#E0E0E0"/>
+<rect x="35" y="925" width="305" height="45" fill="#F8F8F8" stroke="#E0E0E0"/>
+<rect x="35" y="980" width="305" height="80" fill="#F8F8F8" stroke="#E0E0E0"/>
+<rect x="35" y="1085" width="305" height="45" fill="#666666"/>
+<text x="187" y="1112" font-family="Arial" font-size="10" fill="#FFFFFF" text-anchor="middle">BOUTON ENVOYER</text>
+<rect x="35" y="1145" width="200" height="8" fill="#E8E8E8"/>
+<rect x="35" y="1180" width="305" height="50" fill="#F0F0F0" stroke="#E0E0E0"/>
+<text x="187" y="1210" font-family="Arial" font-size="9" fill="#888888" text-anchor="middle">GARANTIE 1</text>
+<rect x="35" y="1245" width="305" height="50" fill="#F0F0F0" stroke="#E0E0E0"/>
+<text x="187" y="1275" font-family="Arial" font-size="9" fill="#888888" text-anchor="middle">GARANTIE 2</text>
+<rect x="35" y="1310" width="305" height="50" fill="#F0F0F0" stroke="#E0E0E0"/>
+<text x="187" y="1340" font-family="Arial" font-size="9" fill="#888888" text-anchor="middle">GARANTIE 3</text>
+<rect x="0" y="1400" width="375" height="400" fill="#555555"/>
+<rect x="130" y="1440" width="115" height="16" fill="#666666"/>
+<text x="187" y="1480" font-family="Arial" font-size="10" fill="#CCCCCC" text-anchor="middle">LOGO</text>
+<rect x="100" y="1500" width="175" height="10" fill="#666666"/>
+<circle cx="147" cy="1560" r="20" fill="#666666"/>
+<circle cx="187" cy="1560" r="20" fill="#666666"/>
+<circle cx="227" cy="1560" r="20" fill="#666666"/>
+<rect x="100" y="1620" width="175" height="10" fill="#666666"/>
+<rect x="115" y="1645" width="145" height="10" fill="#666666"/>
+<rect x="0" y="1760" width="375" height="40" fill="#444444"/>
+<text x="187" y="1785" font-family="Arial" font-size="9" fill="#888888" text-anchor="middle">COPYRIGHT</text>
+</svg>

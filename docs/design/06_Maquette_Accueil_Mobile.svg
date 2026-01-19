@@ -1,0 +1,121 @@
+<svg width="375" height="2500" viewBox="0 0 375 2500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- STATUS BAR -->
+  <rect x="0" y="0" width="375" height="44" fill="#1E3A8A"/>
+  <text x="187" y="28" font-family="Arial" font-size="14" fill="#FFFFFF" text-anchor="middle" font-weight="bold">9:41</text>
+
+  <!-- HEADER -->
+  <rect x="0" y="44" width="375" height="60" fill="#FFFFFF"/>
+  <rect x="0" y="103" width="375" height="1" fill="#E5E7EB"/>
+  <text x="25" y="82" font-family="Georgia" font-size="18" fill="#D4A845">✦</text>
+  <text x="45" y="82" font-family="Montserrat, Arial" font-size="16" fill="#1E3A8A" font-weight="bold">Innov'</text>
+  <text x="100" y="82" font-family="Montserrat, Arial" font-size="16" fill="#D4A845" font-weight="bold">Events</text>
+  <rect x="320" y="60" width="40" height="32" rx="8" fill="#F8FAFC"/>
+  <text x="340" y="82" font-family="Arial" font-size="18" fill="#1E293B" text-anchor="middle">☰</text>
+
+  <!-- HERO SECTION -->
+  <rect x="0" y="104" width="375" height="560" fill="#1E3A8A"/>
+  
+  <!-- Decorative circle -->
+  <circle cx="300" cy="150" r="100" fill="#D4A845" fill-opacity="0.1"/>
+  
+  <!-- Hero Image -->
+  <rect x="20" y="124" width="335" height="200" rx="12" fill="#DBEAFE"/>
+  <text x="187" y="235" font-family="Open Sans, Arial" font-size="13" fill="#1E3A8A" fill-opacity="0.5" text-anchor="middle">📷 Image événement corporate</text>
+  
+  <!-- Title -->
+  <text x="20" y="370" font-family="Montserrat, Arial" font-size="28" fill="#FFFFFF" font-weight="bold">Créateurs</text>
+  <text x="20" y="405" font-family="Montserrat, Arial" font-size="28" fill="#FFFFFF" font-weight="bold">d'événements</text>
+  <text x="20" y="440" font-family="Montserrat, Arial" font-size="28" fill="#D4A845" font-weight="bold">exceptionnels</text>
+  
+  <text x="20" y="480" font-family="Open Sans, Arial" font-size="14" fill="#DBEAFE">Séminaires, conférences et soirées</text>
+  <text x="20" y="500" font-family="Open Sans, Arial" font-size="14" fill="#DBEAFE">sur-mesure pour votre entreprise.</text>
+  
+  <!-- CTA Button -->
+  <rect x="20" y="540" width="335" height="56" rx="28" fill="#D4A845"/>
+  <text x="187" y="575" font-family="Montserrat, Arial" font-size="15" fill="#1E3A8A" text-anchor="middle" font-weight="600">Demander un Devis</text>
+  
+  <!-- Trust -->
+  <rect x="20" y="620" width="335" height="1" fill="#FFFFFF" fill-opacity="0.2"/>
+  <text x="187" y="650" font-family="Open Sans, Arial" font-size="12" fill="#DBEAFE" text-anchor="middle"><tspan fill="#FFFFFF" font-weight="bold">+200 clients</tspan> nous font confiance</text>
+
+  <!-- QUI SOMMES-NOUS -->
+  <rect x="0" y="664" width="375" height="420" fill="#F8FAFC"/>
+  
+  <text x="187" y="720" font-family="Montserrat, Arial" font-size="22" fill="#1E293B" text-anchor="middle" font-weight="bold">Qui sommes-nous ?</text>
+  <rect x="147" y="735" width="81" height="3" rx="1" fill="#D4A845"/>
+  
+  <text x="25" y="780" font-family="Open Sans, Arial" font-size="13" fill="#64748B">Innov'Events est une agence événementielle</text>
+  <text x="25" y="800" font-family="Open Sans, Arial" font-size="13" fill="#64748B">haut de gamme, spécialisée dans l'organisation</text>
+  <text x="25" y="820" font-family="Open Sans, Arial" font-size="13" fill="#64748B">de séminaires, conférences et soirées.</text>
+  
+  <text x="35" y="865" font-family="Open Sans, Arial" font-size="13" fill="#1E293B">✓ Accompagnement personnalisé</text>
+  <text x="35" y="890" font-family="Open Sans, Arial" font-size="13" fill="#1E293B">✓ Créativité sans limite</text>
+  <text x="35" y="915" font-family="Open Sans, Arial" font-size="13" fill="#1E293B">✓ Respect des délais</text>
+  <text x="35" y="940" font-family="Open Sans, Arial" font-size="13" fill="#1E293B">✓ Budget maîtrisé</text>
+  
+  <rect x="87" y="980" width="200" height="50" rx="8" fill="#1E3A8A"/>
+  <text x="187" y="1012" font-family="Montserrat, Arial" font-size="14" fill="#FFFFFF" text-anchor="middle" font-weight="600">En savoir plus</text>
+
+  <!-- NOS SERVICES -->
+  <rect x="0" y="1084" width="375" height="720" fill="#FFFFFF"/>
+  
+  <text x="187" y="1140" font-family="Montserrat, Arial" font-size="22" fill="#1E293B" text-anchor="middle" font-weight="bold">Nos Services</text>
+  <rect x="152" y="1155" width="71" height="3" rx="1" fill="#D4A845"/>
+
+  <!-- Service 1 - Séminaires -->
+  <rect x="20" y="1190" width="335" height="200" rx="12" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <circle cx="70" cy="1250" r="32" fill="#DBEAFE"/>
+  <text x="70" y="1258" font-family="Arial" font-size="22" fill="#1E3A8A" text-anchor="middle">🎤</text>
+  <text x="120" y="1245" font-family="Montserrat, Arial" font-size="18" fill="#1E293B" font-weight="bold">Séminaires</text>
+  <text x="120" y="1275" font-family="Open Sans, Arial" font-size="12" fill="#64748B">Organisation complète de vos</text>
+  <text x="120" y="1295" font-family="Open Sans, Arial" font-size="12" fill="#64748B">séminaires d'entreprise.</text>
+  <text x="40" y="1340" font-family="Open Sans, Arial" font-size="11" fill="#94A3B8">✓ Lieu sur mesure  ✓ Restauration</text>
+  <text x="40" y="1365" font-family="Montserrat, Arial" font-size="12" fill="#1E3A8A" font-weight="600">Demander un devis →</text>
+
+  <!-- Service 2 - Conférences -->
+  <rect x="20" y="1410" width="335" height="200" rx="12" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <circle cx="70" cy="1470" r="32" fill="#DBEAFE"/>
+  <text x="70" y="1478" font-family="Arial" font-size="22" fill="#1E3A8A" text-anchor="middle">👥</text>
+  <text x="120" y="1465" font-family="Montserrat, Arial" font-size="18" fill="#1E293B" font-weight="bold">Conférences</text>
+  <text x="120" y="1495" font-family="Open Sans, Arial" font-size="12" fill="#64748B">Événements professionnels</text>
+  <text x="120" y="1515" font-family="Open Sans, Arial" font-size="12" fill="#64748B">impactants.</text>
+  <text x="40" y="1560" font-family="Open Sans, Arial" font-size="11" fill="#94A3B8">✓ Streaming live  ✓ Networking</text>
+  <text x="40" y="1585" font-family="Montserrat, Arial" font-size="12" fill="#1E3A8A" font-weight="600">Demander un devis →</text>
+
+  <!-- Service 3 - Soirées -->
+  <rect x="20" y="1630" width="335" height="200" rx="12" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <circle cx="70" cy="1690" r="32" fill="#DBEAFE"/>
+  <text x="70" y="1698" font-family="Arial" font-size="22" fill="#1E3A8A" text-anchor="middle">🎉</text>
+  <text x="120" y="1685" font-family="Montserrat, Arial" font-size="18" fill="#1E293B" font-weight="bold">Soirées</text>
+  <text x="120" y="1715" font-family="Open Sans, Arial" font-size="12" fill="#64748B">Soirées d'entreprise</text>
+  <text x="120" y="1735" font-family="Open Sans, Arial" font-size="12" fill="#64748B">mémorables.</text>
+  <text x="40" y="1780" font-family="Open Sans, Arial" font-size="11" fill="#94A3B8">✓ Animation  ✓ Traiteur</text>
+  <text x="40" y="1805" font-family="Montserrat, Arial" font-size="12" fill="#1E3A8A" font-weight="600">Demander un devis →</text>
+
+  <!-- CTA SECTION -->
+  <rect x="0" y="1850" width="375" height="240" fill="#1E293B"/>
+  
+  <text x="187" y="1920" font-family="Montserrat, Arial" font-size="22" fill="#FFFFFF" text-anchor="middle" font-weight="bold">Prêt à créer votre</text>
+  <text x="187" y="1950" font-family="Montserrat, Arial" font-size="22" fill="#FFFFFF" text-anchor="middle" font-weight="bold">événement ?</text>
+  <text x="187" y="1990" font-family="Open Sans, Arial" font-size="13" fill="#94A3B8" text-anchor="middle">Notre équipe vous répondra sous 24h.</text>
+  
+  <rect x="50" y="2020" width="275" height="56" rx="28" fill="#D4A845"/>
+  <text x="187" y="2055" font-family="Montserrat, Arial" font-size="15" fill="#1E3A8A" text-anchor="middle" font-weight="600">Contactez-nous</text>
+
+  <!-- FOOTER -->
+  <rect x="0" y="2090" width="375" height="340" fill="#1E3A8A"/>
+  
+  <text x="187" y="2150" font-family="Montserrat, Arial" font-size="20" fill="#FFFFFF" text-anchor="middle" font-weight="bold">INNOV'EVENTS</text>
+  <text x="187" y="2180" font-family="Open Sans, Arial" font-size="12" fill="#DBEAFE" text-anchor="middle">Créateurs d'événements exceptionnels</text>
+  
+  <!-- Social Icons -->
+  <circle cx="147" cy="2240" r="24" fill="#2A4A6F"/>
+  <circle cx="187" cy="2240" r="24" fill="#2A4A6F"/>
+  <circle cx="227" cy="2240" r="24" fill="#2A4A6F"/>
+  
+  <text x="187" y="2310" font-family="Open Sans, Arial" font-size="13" fill="#DBEAFE" text-anchor="middle">contact@innovevents.com</text>
+  <text x="187" y="2335" font-family="Open Sans, Arial" font-size="13" fill="#DBEAFE" text-anchor="middle">01 23 45 67 89</text>
+  
+  <rect x="0" y="2380" width="375" height="50" fill="#152A45"/>
+  <text x="187" y="2410" font-family="Open Sans, Arial" font-size="10" fill="#6B8CAE" text-anchor="middle">© 2026 Innov'Events. Tous droits réservés.</text>
+</svg>

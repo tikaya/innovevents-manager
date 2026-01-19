@@ -1,0 +1,92 @@
+<svg width="1440" height="1400" viewBox="0 0 1440 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1440" height="1400" fill="#DBEAFE"/>
+<rect x="0" y="0" width="1440" height="80" fill="#FFFFFF"/>
+<rect x="0" y="79" width="1440" height="1" fill="#E5E7EB"/>
+<text x="80" y="48" font-family="Georgia" font-size="20" fill="#D4A845">✦</text>
+<text x="105" y="48" font-family="Arial" font-size="18" fill="#1E3A8A" font-weight="bold">Innov</text>
+<text x="160" y="48" font-family="Arial" font-size="18" fill="#D4A845" font-weight="bold">Events</text>
+<text x="550" y="45" font-family="Arial" font-size="14" fill="#1E293B">Accueil</text>
+<text x="650" y="45" font-family="Arial" font-size="14" fill="#1E293B">Evenements</text>
+<text x="780" y="45" font-family="Arial" font-size="14" fill="#1E293B">Avis</text>
+<text x="850" y="45" font-family="Arial" font-size="14" fill="#1E3A8A" font-weight="bold">Devis</text>
+<text x="950" y="45" font-family="Arial" font-size="14" fill="#1E293B">Contact</text>
+<rect x="1250" y="22" width="130" height="40" rx="8" fill="#1E3A8A"/>
+<text x="1315" y="47" font-family="Arial" font-size="13" fill="#FFFFFF" text-anchor="middle" font-weight="bold">Connexion</text>
+<rect x="0" y="80" width="1440" height="120" fill="#DBEAFE"/>
+<text x="720" y="110" font-family="Arial" font-size="12" fill="#D4A845" text-anchor="middle" font-weight="bold">DEVIS GRATUIT</text>
+<text x="720" y="150" font-family="Arial" font-size="36" fill="#1E3A8A" text-anchor="middle" font-weight="bold">Demande de Devis</text>
+<rect x="680" y="165" width="80" height="4" rx="2" fill="#D4A845"/>
+<text x="720" y="195" font-family="Arial" font-size="14" fill="#64748B" text-anchor="middle">Remplissez ce formulaire et nous vous recontacterons sous 24h.</text>
+<rect x="200" y="220" width="1040" height="920" rx="12" fill="#FFFFFF"/>
+<rect x="450" y="245" width="540" height="36" fill="#F8FAFC" rx="18"/>
+<circle cx="520" cy="263" r="13" fill="#1E3A8A"/>
+<text x="520" y="268" font-family="Arial" font-size="10" fill="#FFFFFF" text-anchor="middle" font-weight="bold">1</text>
+<text x="555" y="268" font-family="Arial" font-size="12" fill="#1E3A8A" font-weight="bold">Vos informations</text>
+<rect x="680" y="261" width="50" height="3" fill="#E2E8F0"/>
+<circle cx="770" cy="263" r="13" fill="#E2E8F0"/>
+<text x="770" y="268" font-family="Arial" font-size="10" fill="#94A3B8" text-anchor="middle">2</text>
+<text x="805" y="268" font-family="Arial" font-size="12" fill="#94A3B8">Confirmation</text>
+<text x="260" y="320" font-family="Arial" font-size="15" fill="#1E293B" font-weight="bold">🏢 Informations entreprise</text>
+<text x="240" y="355" font-family="Arial" font-size="12" fill="#1E293B" font-weight="bold">Nom de l entreprise *</text>
+<rect x="240" y="365" width="960" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="260" y="395" font-family="Arial" font-size="12" fill="#94A3B8">Votre entreprise</text>
+<text x="260" y="450" font-family="Arial" font-size="15" fill="#1E293B" font-weight="bold">👤 Vos coordonnees</text>
+<text x="240" y="485" font-family="Arial" font-size="12" fill="#1E293B" font-weight="bold">Prenom *</text>
+<rect x="240" y="495" width="460" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="260" y="525" font-family="Arial" font-size="12" fill="#94A3B8">Votre prenom</text>
+<text x="740" y="485" font-family="Arial" font-size="12" fill="#1E293B" font-weight="bold">Nom *</text>
+<rect x="740" y="495" width="460" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="760" y="525" font-family="Arial" font-size="12" fill="#94A3B8">Votre nom</text>
+<text x="240" y="565" font-family="Arial" font-size="12" fill="#1E293B" font-weight="bold">Email *</text>
+<rect x="240" y="575" width="460" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="260" y="605" font-family="Arial" font-size="12" fill="#94A3B8">exemple@email.com</text>
+<text x="740" y="565" font-family="Arial" font-size="12" fill="#1E293B" font-weight="bold">Telephone *</text>
+<rect x="740" y="575" width="460" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="760" y="605" font-family="Arial" font-size="12" fill="#94A3B8">06 12 34 56 78</text>
+<text x="260" y="665" font-family="Arial" font-size="15" fill="#1E293B" font-weight="bold">📅 Votre evenement</text>
+<text x="240" y="700" font-family="Arial" font-size="12" fill="#1E293B" font-weight="bold">Type d evenement *</text>
+<rect x="240" y="710" width="460" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="260" y="740" font-family="Arial" font-size="12" fill="#94A3B8">Selectionnez un type</text>
+<text x="740" y="700" font-family="Arial" font-size="12" fill="#1E293B" font-weight="bold">Lieu souhaite *</text>
+<rect x="740" y="710" width="460" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="760" y="740" font-family="Arial" font-size="12" fill="#94A3B8">Ville ou adresse</text>
+<text x="240" y="780" font-family="Arial" font-size="12" fill="#1E293B" font-weight="bold">Date souhaitee *</text>
+<rect x="240" y="790" width="460" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="260" y="820" font-family="Arial" font-size="12" fill="#94A3B8">jj/mm/aaaa</text>
+<text x="740" y="780" font-family="Arial" font-size="12" fill="#1E293B" font-weight="bold">Nombre de participants *</text>
+<rect x="740" y="790" width="460" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="760" y="820" font-family="Arial" font-size="12" fill="#94A3B8">Ex: 50</text>
+<text x="240" y="860" font-family="Arial" font-size="12" fill="#1E293B" font-weight="bold">Decrivez votre projet *</text>
+<rect x="240" y="870" width="960" height="90" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="260" y="905" font-family="Arial" font-size="12" fill="#94A3B8">Parlez-nous de votre evenement...</text>
+<rect x="240" y="985" width="960" height="1" fill="#E2E8F0"/>
+<rect x="240" y="1010" width="220" height="52" rx="8" fill="#D4A845"/>
+<text x="350" y="1042" font-family="Arial" font-size="14" fill="#1E3A8A" text-anchor="middle" font-weight="bold">Envoyer ma demande</text>
+<text x="240" y="1095" font-family="Arial" font-size="11" fill="#94A3B8">Vos donnees sont traitees conformement au RGPD.</text>
+<rect x="220" y="1080" width="320" height="60" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="255" y="1115" font-family="Arial" font-size="22" fill="#D4A845">⚡</text>
+<text x="290" y="1105" font-family="Arial" font-size="13" fill="#1E293B" font-weight="bold">Reponse rapide</text>
+<text x="290" y="1123" font-family="Arial" font-size="11" fill="#64748B">Sous 24h</text>
+<rect x="560" y="1080" width="320" height="60" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="595" y="1115" font-family="Arial" font-size="22" fill="#D4A845">🎯</text>
+<text x="630" y="1105" font-family="Arial" font-size="13" fill="#1E293B" font-weight="bold">Devis personnalise</text>
+<text x="630" y="1123" font-family="Arial" font-size="11" fill="#64748B">Adapte a vos besoins</text>
+<rect x="900" y="1080" width="320" height="60" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+<text x="935" y="1115" font-family="Arial" font-size="22" fill="#D4A845">💰</text>
+<text x="970" y="1105" font-family="Arial" font-size="13" fill="#1E293B" font-weight="bold">Sans engagement</text>
+<text x="970" y="1123" font-family="Arial" font-size="11" fill="#64748B">100% gratuit</text>
+<rect x="0" y="1200" width="1440" height="200" fill="#1E3A8A"/>
+<text x="100" y="1250" font-family="Georgia" font-size="18" fill="#D4A845">✦</text>
+<text x="125" y="1250" font-family="Arial" font-size="15" fill="#FFFFFF" font-weight="bold">Innov Events</text>
+<text x="100" y="1280" font-family="Arial" font-size="12" fill="#DBEAFE">Votre partenaire evenementiel</text>
+<text x="500" y="1250" font-family="Arial" font-size="13" fill="#FFFFFF" font-weight="bold">Navigation</text>
+<text x="500" y="1275" font-family="Arial" font-size="11" fill="#DBEAFE">Accueil</text>
+<text x="500" y="1295" font-family="Arial" font-size="11" fill="#DBEAFE">Evenements</text>
+<text x="500" y="1315" font-family="Arial" font-size="11" fill="#DBEAFE">Contact</text>
+<text x="800" y="1250" font-family="Arial" font-size="13" fill="#FFFFFF" font-weight="bold">Contact</text>
+<text x="800" y="1275" font-family="Arial" font-size="11" fill="#DBEAFE">contact@innovevents.com</text>
+<text x="800" y="1295" font-family="Arial" font-size="11" fill="#DBEAFE">01 23 45 67 89</text>
+<text x="800" y="1315" font-family="Arial" font-size="11" fill="#DBEAFE">Paris, France</text>
+<rect x="0" y="1360" width="1440" height="40" fill="#152A45"/>
+<text x="720" y="1385" font-family="Arial" font-size="11" fill="#6B8CAE" text-anchor="middle">2026 Innov Events. Tous droits reserves.</text>
+</svg>

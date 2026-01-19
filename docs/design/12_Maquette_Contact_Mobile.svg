@@ -1,0 +1,82 @@
+<svg width="375" height="1700" viewBox="0 0 375 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- STATUS BAR -->
+  <rect x="0" y="0" width="375" height="44" fill="#1E3A8A"/>
+  <text x="187" y="28" font-family="Arial" font-size="14" fill="#FFFFFF" text-anchor="middle" font-weight="bold">9:41</text>
+
+  <!-- HEADER -->
+  <rect x="0" y="44" width="375" height="60" fill="#FFFFFF"/>
+  <rect x="0" y="103" width="375" height="1" fill="#E5E7EB"/>
+  <text x="25" y="82" font-family="Georgia" font-size="18" fill="#D4A845">✦</text>
+  <text x="45" y="82" font-family="Montserrat, Arial" font-size="16" fill="#1E3A8A" font-weight="bold">Innov'</text>
+  <text x="100" y="82" font-family="Montserrat, Arial" font-size="16" fill="#D4A845" font-weight="bold">Events</text>
+  <rect x="320" y="60" width="40" height="32" rx="8" fill="#F8FAFC"/>
+  <text x="340" y="82" font-family="Arial" font-size="18" fill="#1E293B" text-anchor="middle">☰</text>
+
+  <!-- HERO -->
+  <rect x="0" y="104" width="375" height="140" fill="#1E3A8A"/>
+  <text x="187" y="165" font-family="Montserrat, Arial" font-size="24" fill="#FFFFFF" text-anchor="middle" font-weight="bold">Contactez-nous</text>
+  <text x="187" y="200" font-family="Open Sans, Arial" font-size="13" fill="#DBEAFE" text-anchor="middle">Une question ? Un projet ?</text>
+
+  <!-- COORDONNÉES -->
+  <rect x="0" y="244" width="375" height="380" fill="#F8FAFC"/>
+  <text x="187" y="285" font-family="Montserrat, Arial" font-size="18" fill="#1E293B" text-anchor="middle" font-weight="bold">Nos coordonnées</text>
+  
+  <!-- Email -->
+  <rect x="20" y="310" width="335" height="70" rx="8" fill="#FFFFFF"/>
+  <circle cx="55" cy="345" r="22" fill="#DBEAFE"/>
+  <text x="55" y="351" font-family="Arial" font-size="14" fill="#1E3A8A" text-anchor="middle">✉</text>
+  <text x="90" y="338" font-family="Montserrat, Arial" font-size="13" fill="#1E293B" font-weight="600">Email</text>
+  <text x="90" y="358" font-family="Open Sans, Arial" font-size="12" fill="#64748B">contact@innovevents.com</text>
+
+  <!-- Téléphone -->
+  <rect x="20" y="400" width="335" height="70" rx="8" fill="#FFFFFF"/>
+  <circle cx="55" cy="435" r="22" fill="#DBEAFE"/>
+  <text x="55" y="441" font-family="Arial" font-size="14" fill="#1E3A8A" text-anchor="middle">📞</text>
+  <text x="90" y="428" font-family="Montserrat, Arial" font-size="13" fill="#1E293B" font-weight="600">Téléphone</text>
+  <text x="90" y="448" font-family="Open Sans, Arial" font-size="12" fill="#64748B">01 23 45 67 89</text>
+
+  <!-- Adresse -->
+  <rect x="20" y="490" width="335" height="70" rx="8" fill="#FFFFFF"/>
+  <circle cx="55" cy="525" r="22" fill="#DBEAFE"/>
+  <text x="55" y="531" font-family="Arial" font-size="14" fill="#1E3A8A" text-anchor="middle">📍</text>
+  <text x="90" y="518" font-family="Montserrat, Arial" font-size="13" fill="#1E293B" font-weight="600">Adresse</text>
+  <text x="90" y="538" font-family="Open Sans, Arial" font-size="12" fill="#64748B">123 Avenue des Événements, Paris</text>
+
+  <!-- FORMULAIRE -->
+  <rect x="0" y="624" width="375" height="580" fill="#FFFFFF"/>
+  <text x="187" y="670" font-family="Montserrat, Arial" font-size="18" fill="#1E293B" text-anchor="middle" font-weight="bold">Envoyez un message</text>
+  
+  <text x="20" y="710" font-family="Montserrat, Arial" font-size="12" fill="#1E293B" font-weight="600">Nom (facultatif)</text>
+  <rect x="20" y="720" width="335" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="35" y="750" font-family="Open Sans, Arial" font-size="12" fill="#94A3B8">Votre nom</text>
+
+  <text x="20" y="790" font-family="Montserrat, Arial" font-size="12" fill="#1E293B" font-weight="600">Email *</text>
+  <rect x="20" y="800" width="335" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="35" y="830" font-family="Open Sans, Arial" font-size="12" fill="#94A3B8">exemple@email.com</text>
+
+  <text x="20" y="870" font-family="Montserrat, Arial" font-size="12" fill="#1E293B" font-weight="600">Sujet *</text>
+  <rect x="20" y="880" width="335" height="48" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="35" y="910" font-family="Open Sans, Arial" font-size="12" fill="#94A3B8">Objet du message</text>
+
+  <text x="20" y="950" font-family="Montserrat, Arial" font-size="12" fill="#1E293B" font-weight="600">Message *</text>
+  <rect x="20" y="960" width="335" height="130" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="35" y="995" font-family="Open Sans, Arial" font-size="12" fill="#94A3B8">Votre message...</text>
+
+  <rect x="20" y="1110" width="335" height="50" rx="8" fill="#1E3A8A"/>
+  <text x="187" y="1142" font-family="Montserrat, Arial" font-size="14" fill="#FFFFFF" text-anchor="middle" font-weight="600">✉ Envoyer le message</text>
+
+  <!-- FOOTER -->
+  <rect x="0" y="1204" width="375" height="300" fill="#1E3A8A"/>
+  <text x="187" y="1260" font-family="Montserrat, Arial" font-size="18" fill="#FFFFFF" text-anchor="middle" font-weight="bold">INNOV'EVENTS</text>
+  <text x="187" y="1290" font-family="Open Sans, Arial" font-size="12" fill="#DBEAFE" text-anchor="middle">Créateurs d'événements exceptionnels</text>
+  
+  <circle cx="147" cy="1350" r="22" fill="#2A4A6F"/>
+  <circle cx="187" cy="1350" r="22" fill="#2A4A6F"/>
+  <circle cx="227" cy="1350" r="22" fill="#2A4A6F"/>
+  
+  <text x="187" y="1410" font-family="Open Sans, Arial" font-size="12" fill="#DBEAFE" text-anchor="middle">contact@innovevents.com</text>
+  <text x="187" y="1435" font-family="Open Sans, Arial" font-size="12" fill="#DBEAFE" text-anchor="middle">01 23 45 67 89</text>
+  
+  <rect x="0" y="1470" width="375" height="30" fill="#152A45"/>
+  <text x="187" y="1490" font-family="Open Sans, Arial" font-size="10" fill="#6B8CAE" text-anchor="middle">© 2026 Innov'Events</text>
+</svg>
