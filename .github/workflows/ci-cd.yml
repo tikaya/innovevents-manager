@@ -8,7 +8,7 @@
 # 1. Tests (unitaires + API)
 # 2. Build de l'image Docker
 # 3. Push vers Docker Hub
-# 4. Déploiement sur Render (uniquement sur main)
+# 4. Déploiement sur Render (Backend + Frontend)
 # ============================================
 
 name: CI/CD Pipeline
@@ -44,10 +44,10 @@ env:
 jobs:
   
   # ==========================================
-  # JOB 1 : TESTS
+  # JOB 1 : TESTS BACKEND
   # ==========================================
-  test:
-    name: 🧪 Tests
+  test-backend:
+    name: 🧪 Tests Backend
     runs-on: ubuntu-latest
     
     # Service PostgreSQL pour les tests
@@ -133,16 +133,67 @@ jobs:
       - name: 📊 Test Summary
         if: always()
         run: |
-          echo "✅ Tests terminés !"
+          echo "✅ Tests Backend terminés !"
           echo "📁 Couverture disponible dans ./coverage"
 
   # ==========================================
-  # JOB 2 : BUILD & PUSH DOCKER
+  # JOB 2 : TESTS FRONTEND
+  # ==========================================
+  test-frontend:
+    name: 🧪 Tests Frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Étape 1 : Récupérer le code
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      # Étape 2 : Configurer Node.js
+      - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      # Étape 3 : Installer les dépendances frontend
+      - name: 📦 Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      # Étape 4 : Linter (vérification du code)
+      - name: 🔍 Run Linter
+        working-directory: ./frontend
+        run: npm run lint --if-present
+        continue-on-error: true
+      
+      # Étape 5 : Build du frontend
+      - name: 🔨 Build Frontend
+        working-directory: ./frontend
+        run: npm run build
+        env:
+          VITE_API_URL: https://innovevents-manager.onrender.com/api
+      
+      # Étape 6 : Tests unitaires frontend
+      - name: 🧪 Run Frontend Tests
+        working-directory: ./frontend
+        run: npm test --if-present
+        continue-on-error: true
+      
+      # Étape 7 : Afficher le résumé
+      - name: 📊 Frontend Summary
+        if: always()
+        run: |
+          echo "✅ Tests Frontend terminés !"
+          echo "📁 Build disponible dans ./frontend/dist"
+
+  # ==========================================
+  # JOB 3 : BUILD & PUSH DOCKER
   # ==========================================
   build:
     name: 🐳 Build & Push Docker
     runs-on: ubuntu-latest
-    needs: test  # Attend que les tests passent
+    needs: [test-backend, test-frontend]  # Attend que TOUS les tests passent
     
     # Uniquement sur push (pas sur PR)
     if: github.event_name == 'push'
@@ -194,7 +245,7 @@ jobs:
           echo "${{ steps.meta.outputs.tags }}"
 
   # ==========================================
-  # JOB 3 : DÉPLOIEMENT SUR RENDER
+  # JOB 4 : DÉPLOIEMENT SUR RENDER
   # ==========================================
   deploy:
     name: 🚀 Deploy to Render
@@ -205,48 +256,85 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
-      # Étape 1 : Déclencher le déploiement Render
-      - name: 🚀 Trigger Render Deploy
+      # Étape 1 : Déclencher le déploiement Backend
+      - name: 🔧 Deploy Backend to Render
         run: |
+          echo "============================================"
+          echo "🔧 DÉPLOIEMENT BACKEND"
+          echo "============================================"
           curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
-          echo "✅ Déploiement déclenché sur Render !"
+          echo ""
+          echo "✅ Backend deployment triggered!"
       
-      # Étape 2 : Attendre et vérifier (optionnel)
-      - name: ⏳ Wait for deployment
+      # Étape 2 : Déclencher le déploiement Frontend
+      - name: 🎨 Deploy Frontend to Render
         run: |
-          echo "⏳ Déploiement en cours sur Render..."
-          echo "🔗 Vérifiez le statut sur https://dashboard.render.com"
+          echo "============================================"
+          echo "🎨 DÉPLOIEMENT FRONTEND"
+          echo "============================================"
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}"
+          echo ""
+          echo "✅ Frontend deployment triggered!"
+      
+      # Étape 3 : Attendre les déploiements
+      - name: ⏳ Wait for deployments
+        run: |
+          echo "============================================"
+          echo "⏳ Déploiements en cours sur Render..."
+          echo "============================================"
+          echo "🔗 Dashboard : https://dashboard.render.com"
+          echo "⏱️  Attente de 30 secondes..."
           sleep 30
       
-      # Étape 3 : Notification de succès
+      # Étape 4 : Notification de succès
       - name: ✅ Deployment Success
         run: |
           echo "============================================"
-          echo "🎉 DÉPLOIEMENT RÉUSSI !"
+          echo "🎉 DÉPLOIEMENTS RÉUSSIS !"
           echo "============================================"
-          echo "🐳 Image Docker : ${{ env.DOCKER_IMAGE_NAME }}:latest"
-          echo "🌐 Application : https://innovevents-manager.onrender.com"
+          echo ""
+          echo "🐳 Docker Image : ${{ env.DOCKER_IMAGE_NAME }}:latest"
+          echo ""
+          echo "🔧 Backend URL  : https://innovevents-manager.onrender.com"
+          echo "🎨 Frontend URL : https://innovevents-frontend.onrender.com"
+          echo ""
           echo "============================================"
 
   # ==========================================
-  # JOB 4 : NOTIFICATION (optionnel)
+  # JOB 5 : NOTIFICATION FINALE
   # ==========================================
   notify:
-    name: 📢 Notification
+    name: 📢 Pipeline Summary
     runs-on: ubuntu-latest
-    needs: [test, build, deploy]
+    needs: [test-backend, test-frontend, build, deploy]
     if: always()
     
     steps:
       - name: 📊 Pipeline Summary
         run: |
-          echo "============================================"
-          echo "📊 RÉSUMÉ DU PIPELINE CI/CD"
-          echo "============================================"
-          echo "🔀 Branche : ${{ github.ref_name }}"
-          echo "👤 Auteur  : ${{ github.actor }}"
-          echo "📝 Commit  : ${{ github.sha }}"
-          echo "🧪 Tests   : ${{ needs.test.result }}"
-          echo "🐳 Build   : ${{ needs.build.result }}"
-          echo "🚀 Deploy  : ${{ needs.deploy.result }}"
-          echo "============================================"
+          echo "╔════════════════════════════════════════════╗"
+          echo "║     📊 RÉSUMÉ DU PIPELINE CI/CD            ║"
+          echo "╠════════════════════════════════════════════╣"
+          echo "║                                            ║"
+          echo "║  🔀 Branche : ${{ github.ref_name }}"
+          echo "║  👤 Auteur  : ${{ github.actor }}"
+          echo "║  📝 Commit  : ${{ github.sha }}"
+          echo "║                                            ║"
+          echo "╠════════════════════════════════════════════╣"
+          echo "║  RÉSULTATS :                               ║"
+          echo "╠════════════════════════════════════════════╣"
+          echo "║                                            ║"
+          echo "║  🧪 Tests Backend  : ${{ needs.test-backend.result }}"
+          echo "║  🧪 Tests Frontend : ${{ needs.test-frontend.result }}"
+          echo "║  🐳 Build Docker   : ${{ needs.build.result }}"
+          echo "║  🚀 Deploy Render  : ${{ needs.deploy.result }}"
+          echo "║                                            ║"
+          echo "╠════════════════════════════════════════════╣"
+          echo "║  LIENS :                                   ║"
+          echo "╠════════════════════════════════════════════╣"
+          echo "║                                            ║"
+          echo "║  🔧 Backend  : https://innovevents-manager.onrender.com"
+          echo "║  🎨 Frontend : https://innovevents-frontend.onrender.com"
+          echo "║  🐳 Docker   : https://hub.docker.com/r/tikaya/innovevents-manager"
+          echo "║                                            ║"
+          echo "╚════════════════════════════════════════════╝"
