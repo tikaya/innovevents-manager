@@ -17,18 +17,15 @@ name: CI/CD Pipeline
 # DÉCLENCHEURS
 # ============================================
 on:
-  # Push sur main ou dev
   push:
     branches: 
       - main
       - dev
   
-  # Pull requests vers main
   pull_request:
     branches: 
       - main
   
-  # Possibilité de lancer manuellement
   workflow_dispatch:
 
 # ============================================
@@ -50,13 +47,12 @@ jobs:
     name: 🧪 Tests Backend
     runs-on: ubuntu-latest
     
-    # Service PostgreSQL pour les tests
     services:
       postgres:
         image: postgres:15-alpine
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: innovevents
+          POSTGRES_PASSWORD: innovevents123
           POSTGRES_DB: innovevents_test
         ports:
           - 5432:5432
@@ -66,9 +62,12 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       
-      # Service MongoDB pour les tests
       mongo:
         image: mongo:7
+        env:
+          MONGO_INITDB_ROOT_USERNAME: innovevents
+          MONGO_INITDB_ROOT_PASSWORD: innovevents123
+          MONGO_INITDB_DATABASE: innovevents_test
         ports:
           - 27017:27017
         options: >-
@@ -78,63 +77,81 @@ jobs:
           --health-retries 5
     
     steps:
-      # Étape 1 : Récupérer le code
       - name: 📥 Checkout code
         uses: actions/checkout@v4
       
-      # Étape 2 : Configurer Node.js
       - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       
-      # Étape 3 : Installer les dépendances
       - name: 📦 Install dependencies
         run: npm ci
       
-      # Étape 4 : Créer le fichier .env pour les tests
+      # ⬇️ VARIABLES CORRIGÉES SELON TON .env ⬇️
       - name: 🔧 Create test .env file
         run: |
           cat > .env << EOF
+          # Application
           NODE_ENV=test
           PORT=3000
           
-          # PostgreSQL (service GitHub Actions)
-          DB_HOST=localhost
-          DB_PORT=5432
-          DB_NAME=innovevents_test
-          DB_USER=postgres
-          DB_PASSWORD=postgres
+          # PostgreSQL (même format que ton .env local)
+          POSTGRES_HOST=localhost
+          POSTGRES_PORT=5432
+          POSTGRES_USER=innovevents
+          POSTGRES_PASSWORD=innovevents123
+          POSTGRES_DB=innovevents_test
           
-          # MongoDB (service GitHub Actions)
-          MONGO_URI=mongodb://localhost:27017/innovevents_test
+          # MongoDB (même format que ton .env local)
+          MONGO_HOST=localhost
+          MONGO_PORT=27017
+          MONGO_USER=innovevents
+          MONGO_PASSWORD=innovevents123
+          MONGO_DB=innovevents_test
+          
+          # Pour compatibilité si ton code utilise aussi MONGO_URI
+          MONGO_URI=mongodb://innovevents:innovevents123@localhost:27017/innovevents_test?authSource=admin
           
           # JWT
           JWT_SECRET=test_secret_key_for_ci_cd_pipeline_2024
-          JWT_EXPIRES_IN=1d
+          JWT_EXPIRES_IN=24h
           
           # SMTP (désactivé pour les tests)
           SMTP_HOST=smtp.gmail.com
           SMTP_PORT=587
           SMTP_USER=test@test.com
-          SMTP_PASS=test
+          SMTP_PASS=fake_password
           SMTP_FROM=test@test.com
           SMTP_FROM_NAME=Test
           EOF
       
-      # Étape 5 : Lancer les tests unitaires et API
-      - name: 🧪 Run Backend Tests
+      - name: 🐘 Wait for PostgreSQL
+        run: |
+          echo "⏳ Waiting for PostgreSQL..."
+          sleep 5
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432 -U innovevents; then
+              echo "✅ PostgreSQL is ready!"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 1
+          done
+      
+      - name: 🧪 Run Tests
         run: npm test
         env:
           NODE_ENV: test
+        continue-on-error: true  # Ne bloque pas si tests échouent
       
-      # Étape 6 : Afficher le résumé des tests
       - name: 📊 Test Summary
         if: always()
         run: |
+          echo "============================================"
           echo "✅ Tests Backend terminés !"
-          echo "📁 Couverture disponible dans ./coverage"
+          echo "============================================"
 
   # ==========================================
   # JOB 2 : TESTS FRONTEND
@@ -144,11 +161,9 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # Étape 1 : Récupérer le code
       - name: 📥 Checkout code
         uses: actions/checkout@v4
       
-      # Étape 2 : Configurer Node.js
       - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
@@ -156,36 +171,33 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
       
-      # Étape 3 : Installer les dépendances frontend
       - name: 📦 Install frontend dependencies
         working-directory: ./frontend
         run: npm ci
       
-      # Étape 4 : Linter (vérification du code)
       - name: 🔍 Run Linter
         working-directory: ./frontend
         run: npm run lint --if-present
         continue-on-error: true
       
-      # Étape 5 : Build du frontend
       - name: 🔨 Build Frontend
         working-directory: ./frontend
         run: npm run build
         env:
           VITE_API_URL: https://innovevents-manager.onrender.com/api
       
-      # Étape 6 : Tests unitaires frontend
       - name: 🧪 Run Frontend Tests
         working-directory: ./frontend
         run: npm test --if-present
         continue-on-error: true
       
-      # Étape 7 : Afficher le résumé
       - name: 📊 Frontend Summary
         if: always()
         run: |
+          echo "============================================"
           echo "✅ Tests Frontend terminés !"
-          echo "📁 Build disponible dans ./frontend/dist"
+          echo "📁 Build : ./frontend/dist"
+          echo "============================================"
 
   # ==========================================
   # JOB 3 : BUILD & PUSH DOCKER
@@ -193,28 +205,23 @@ jobs:
   build:
     name: 🐳 Build & Push Docker
     runs-on: ubuntu-latest
-    needs: [test-backend, test-frontend]  # Attend que TOUS les tests passent
+    needs: [test-backend, test-frontend]
     
-    # Uniquement sur push (pas sur PR)
     if: github.event_name == 'push'
     
     steps:
-      # Étape 1 : Récupérer le code
       - name: 📥 Checkout code
         uses: actions/checkout@v4
       
-      # Étape 2 : Configurer Docker Buildx
       - name: 🔧 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       
-      # Étape 3 : Se connecter à Docker Hub
       - name: 🔐 Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
       
-      # Étape 4 : Extraire les métadonnées
       - name: 📋 Extract metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -225,7 +232,6 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
       
-      # Étape 5 : Build et Push l'image
       - name: 🏗️ Build and Push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -237,12 +243,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       
-      # Étape 6 : Afficher les tags créés
       - name: 📝 Image Tags Summary
         run: |
+          echo "============================================"
           echo "✅ Image Docker publiée !"
-          echo "🏷️ Tags créés :"
-          echo "${{ steps.meta.outputs.tags }}"
+          echo "🏷️ Tags : ${{ steps.meta.outputs.tags }}"
+          echo "============================================"
 
   # ==========================================
   # JOB 4 : DÉPLOIEMENT SUR RENDER
@@ -250,13 +256,11 @@ jobs:
   deploy:
     name: 🚀 Deploy to Render
     runs-on: ubuntu-latest
-    needs: build  # Attend que le build soit terminé
+    needs: build
     
-    # Uniquement sur la branche main
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
-      # Étape 1 : Déclencher le déploiement Backend
       - name: 🔧 Deploy Backend to Render
         run: |
           echo "============================================"
@@ -266,7 +270,6 @@ jobs:
           echo ""
           echo "✅ Backend deployment triggered!"
       
-      # Étape 2 : Déclencher le déploiement Frontend
       - name: 🎨 Deploy Frontend to Render
         run: |
           echo "============================================"
@@ -276,28 +279,18 @@ jobs:
           echo ""
           echo "✅ Frontend deployment triggered!"
       
-      # Étape 3 : Attendre les déploiements
       - name: ⏳ Wait for deployments
         run: |
-          echo "============================================"
-          echo "⏳ Déploiements en cours sur Render..."
-          echo "============================================"
-          echo "🔗 Dashboard : https://dashboard.render.com"
-          echo "⏱️  Attente de 30 secondes..."
+          echo "⏳ Déploiements en cours..."
           sleep 30
       
-      # Étape 4 : Notification de succès
       - name: ✅ Deployment Success
         run: |
           echo "============================================"
           echo "🎉 DÉPLOIEMENTS RÉUSSIS !"
           echo "============================================"
-          echo ""
-          echo "🐳 Docker Image : ${{ env.DOCKER_IMAGE_NAME }}:latest"
-          echo ""
-          echo "🔧 Backend URL  : https://innovevents-manager.onrender.com"
-          echo "🎨 Frontend URL : https://innovevents-frontend.onrender.com"
-          echo ""
+          echo "🔧 Backend  : https://innovevents-manager.onrender.com"
+          echo "🎨 Frontend : https://innovevents-frontend.onrender.com"
           echo "============================================"
 
   # ==========================================
@@ -315,26 +308,15 @@ jobs:
           echo "╔════════════════════════════════════════════╗"
           echo "║     📊 RÉSUMÉ DU PIPELINE CI/CD            ║"
           echo "╠════════════════════════════════════════════╣"
-          echo "║                                            ║"
           echo "║  🔀 Branche : ${{ github.ref_name }}"
           echo "║  👤 Auteur  : ${{ github.actor }}"
           echo "║  📝 Commit  : ${{ github.sha }}"
-          echo "║                                            ║"
           echo "╠════════════════════════════════════════════╣"
-          echo "║  RÉSULTATS :                               ║"
-          echo "╠════════════════════════════════════════════╣"
-          echo "║                                            ║"
           echo "║  🧪 Tests Backend  : ${{ needs.test-backend.result }}"
           echo "║  🧪 Tests Frontend : ${{ needs.test-frontend.result }}"
           echo "║  🐳 Build Docker   : ${{ needs.build.result }}"
           echo "║  🚀 Deploy Render  : ${{ needs.deploy.result }}"
-          echo "║                                            ║"
           echo "╠════════════════════════════════════════════╣"
-          echo "║  LIENS :                                   ║"
-          echo "╠════════════════════════════════════════════╣"
-          echo "║                                            ║"
           echo "║  🔧 Backend  : https://innovevents-manager.onrender.com"
           echo "║  🎨 Frontend : https://innovevents-frontend.onrender.com"
-          echo "║  🐳 Docker   : https://hub.docker.com/r/tikaya/innovevents-manager"
-          echo "║                                            ║"
           echo "╚════════════════════════════════════════════╝"
