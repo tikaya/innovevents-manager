@@ -320,3 +320,4 @@ jobs:
           echo "║  🔧 Backend  : https://innovevents-manager.onrender.com"
           echo "║  🎨 Frontend : https://innovevents-frontend.onrender.com"
           echo "╚════════════════════════════════════════════╝"
+        
