@@ -4,6 +4,7 @@
  */
 
 const EvenementService = require('../services/EvenementService');
+const Client = require('../models/Client'); // ✅ AJOUT
 const { LogService, ACTION_TYPES } = require('../services/LogService');
 const { asyncHandler } = require('../middlewares/errorHandler');
 
@@ -19,6 +20,15 @@ const getPublic = asyncHandler(async (req, res) => {
 
 const getById = asyncHandler(async (req, res) => {
     const evenement = await EvenementService.getById(req.params.id);
+    
+    // ✅ Vérifier que le client ne voit que SES événements
+    if (req.user.role === 'client') {
+        const client = await Client.findByUserId(req.user.id_utilisateur);
+        if (!client || client.id_client !== evenement.id_client) {
+            return res.status(403).json({ success: false, message: 'Accès non autorisé à cet événement' });
+        }
+    }
+    
     res.json({ success: true, data: evenement });
 });
 
@@ -70,9 +80,31 @@ const update = asyncHandler(async (req, res) => {
 const updateStatut = asyncHandler(async (req, res) => {
     const { statut } = req.body;
     
+    // ✅ Validation des statuts autorisés
+    const statutsValides = ['brouillon', 'confirme', 'planifie', 'en_cours', 'termine', 'annule'];
+    if (!statutsValides.includes(statut)) {
+        return res.status(400).json({ 
+            success: false, 
+            message: `Statut invalide. Valeurs autorisées: ${statutsValides.join(', ')}` 
+        });
+    }
+    
     // Récupérer l'ancien statut avant modification
     const ancienEvenement = await EvenementService.getById(req.params.id);
     const ancienStatut = ancienEvenement.statut_evenement;
+    
+    // ✅ Validation des transitions de statut
+    const transitionsInterdites = {
+        'termine': ['brouillon'], // Un événement terminé ne peut pas redevenir brouillon
+        'annule': ['confirme', 'planifie', 'en_cours', 'termine'] // Un événement annulé ne peut pas reprendre
+    };
+    
+    if (transitionsInterdites[ancienStatut]?.includes(statut)) {
+        return res.status(400).json({ 
+            success: false, 
+            message: `Transition de statut non autorisée: ${ancienStatut} → ${statut}` 
+        });
+    }
     
     const evenement = await EvenementService.updateStatut(req.params.id, statut);
     
@@ -94,6 +126,15 @@ const updateStatut = asyncHandler(async (req, res) => {
 
 const remove = asyncHandler(async (req, res) => {
     const evenement = await EvenementService.getById(req.params.id);
+    
+    // ✅ Interdire la suppression d'un événement confirmé ou en cours
+    if (['confirme', 'planifie', 'en_cours'].includes(evenement.statut_evenement)) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Impossible de supprimer un événement confirmé ou en cours. Annulez-le d\'abord.' 
+        });
+    }
+    
     await EvenementService.delete(req.params.id);
     
     // Log suppression événement

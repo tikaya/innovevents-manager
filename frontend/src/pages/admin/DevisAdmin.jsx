@@ -9,7 +9,8 @@ import {
   FileText,
   Send,
   Download,
-  X
+  X,
+  RefreshCw
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -30,10 +31,12 @@ const DevisAdmin = () => {
     prestations: [{ libelle_prestation: '', montant_ht_prestation: 0 }]
   });
 
+  // ✅ Ajout du statut "modification"
   const statuts = [
     { value: 'brouillon', label: 'Brouillon', color: 'bg-gray-100 text-gray-700' },
     { value: 'envoye', label: 'Envoyé', color: 'bg-blue-100 text-blue-700' },
     { value: 'etude_client', label: 'En étude', color: 'bg-yellow-100 text-yellow-700' },
+    { value: 'modification', label: 'Modification demandée', color: 'bg-purple-100 text-purple-700' },
     { value: 'accepte', label: 'Accepté', color: 'bg-green-100 text-green-700' },
     { value: 'refuse', label: 'Refusé', color: 'bg-red-100 text-red-700' }
   ];
@@ -231,6 +234,11 @@ const DevisAdmin = () => {
     );
   };
 
+  // ✅ Vérifie si on peut modifier/envoyer un devis
+  const canEdit = (statut) => ['brouillon', 'modification'].includes(statut);
+  const canSend = (statut) => ['brouillon', 'modification'].includes(statut);
+  const canDelete = (statut) => statut !== 'accepte';
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -297,7 +305,7 @@ const DevisAdmin = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredDevis.map((d) => (
-                  <tr key={d.id_devis} className="hover:bg-gray-50">
+                  <tr key={d.id_devis} className={`hover:bg-gray-50 ${d.statut_devis === 'modification' ? 'bg-purple-50' : ''}`}>
                     <td className="px-4 py-3">
                       <p className="font-semibold text-bleu-royal">{d.numero_devis}</p>
                     </td>
@@ -310,20 +318,31 @@ const DevisAdmin = () => {
                         <button onClick={() => fetchDevisDetail(d.id_devis)} className="p-2 text-bleu-royal hover:bg-bleu-ciel rounded-btn" title="Voir">
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button onClick={() => handleEdit(d)} className="p-2 text-or hover:bg-yellow-50 rounded-btn" title="Modifier">
-                          <Edit className="w-4 h-4" />
-                        </button>
+                        
+                        {/* ✅ Bouton Modifier - visible si brouillon ou modification */}
+                        {canEdit(d.statut_devis) && (
+                          <button onClick={() => handleEdit(d)} className="p-2 text-or hover:bg-yellow-50 rounded-btn" title="Modifier">
+                            <Edit className="w-4 h-4" />
+                          </button>
+                        )}
+                        
                         <button onClick={() => handleDownloadPDF(d.id_devis)} className="p-2 text-green-600 hover:bg-green-50 rounded-btn" title="PDF">
                           <Download className="w-4 h-4" />
                         </button>
-                        {d.statut_devis === 'brouillon' && (
-                          <button onClick={() => handleSend(d.id_devis)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-btn" title="Envoyer">
-                            <Send className="w-4 h-4" />
+                        
+                        {/* ✅ Bouton Envoyer - visible si brouillon OU modification */}
+                        {canSend(d.statut_devis) && (
+                          <button onClick={() => handleSend(d.id_devis)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-btn" title={d.statut_devis === 'modification' ? 'Renvoyer au client' : 'Envoyer au client'}>
+                            {d.statut_devis === 'modification' ? <RefreshCw className="w-4 h-4" /> : <Send className="w-4 h-4" />}
                           </button>
                         )}
-                        <button onClick={() => handleDelete(d.id_devis)} className="p-2 text-red-600 hover:bg-red-50 rounded-btn" title="Supprimer">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        
+                        {/* ✅ Bouton Supprimer - pas si accepté */}
+                        {canDelete(d.statut_devis) && (
+                          <button onClick={() => handleDelete(d.id_devis)} className="p-2 text-red-600 hover:bg-red-50 rounded-btn" title="Supprimer">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -348,10 +367,18 @@ const DevisAdmin = () => {
               </button>
             </div>
             <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-4">
                 {getStatutBadge(selectedDevis.statut_devis)}
                 <p className="text-sm text-gray-500">Créé le {formatDate(selectedDevis.date_creation_devis)}</p>
               </div>
+
+              {/* ✅ Affichage du motif de modification */}
+              {selectedDevis.statut_devis === 'modification' && selectedDevis.motif_modification && (
+                <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-btn">
+                  <p className="text-sm font-semibold text-purple-700 mb-1">📝 Demande de modification du client :</p>
+                  <p className="text-purple-600 whitespace-pre-wrap">{selectedDevis.motif_modification}</p>
+                </div>
+              )}
 
               <div className="border rounded-btn overflow-hidden mb-6">
                 <table className="w-full">
@@ -387,18 +414,32 @@ const DevisAdmin = () => {
                 </div>
               </div>
 
+              {/* ✅ Actions dans le modal */}
               <div className="flex gap-3 mt-6">
-                <button onClick={() => handleDownloadPDF(selectedDevis.id_devis)} className="btn-primary flex-1 flex items-center justify-center gap-2">
+                <button onClick={() => handleDownloadPDF(selectedDevis.id_devis)} className="btn-secondary flex-1 flex items-center justify-center gap-2">
                   <Download className="w-5 h-5" />
                   Télécharger PDF
                 </button>
+                
+                {canEdit(selectedDevis.statut_devis) && (
+                  <>
+                    <button onClick={() => { setShowDetailModal(false); handleEdit(selectedDevis); }} className="btn-secondary flex-1 flex items-center justify-center gap-2">
+                      <Edit className="w-5 h-5" />
+                      Modifier
+                    </button>
+                    <button onClick={() => { setShowDetailModal(false); handleSend(selectedDevis.id_devis); }} className="btn-primary flex-1 flex items-center justify-center gap-2">
+                      {selectedDevis.statut_devis === 'modification' ? <RefreshCw className="w-5 h-5" /> : <Send className="w-5 h-5" />}
+                      {selectedDevis.statut_devis === 'modification' ? 'Renvoyer' : 'Envoyer'}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal Formulaire */}
+      {/* Modal Formulaire - inchangé */}
       {showFormModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-card max-w-3xl w-full max-h-[90vh] overflow-y-auto">
@@ -420,6 +461,7 @@ const DevisAdmin = () => {
                     value={formData.id_evenement}
                     onChange={(e) => setFormData({...formData, id_evenement: e.target.value})}
                     required
+                    disabled={selectedDevis} // Ne pas changer l'événement en modification
                   >
                     <option value="">Sélectionner</option>
                     {evenements.map(e => (

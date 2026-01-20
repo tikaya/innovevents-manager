@@ -6,6 +6,7 @@
 const Devis = require('../models/Devis');
 const Prestation = require('../models/Prestation');
 const Client = require('../models/Client');
+const Evenement = require('../models/Evenement'); // ✅ AJOUT
 const EmailService = require('./EmailService');
 const PdfService = require('./PdfService');
 const { getClient } = require('../config/database');
@@ -36,6 +37,21 @@ class DevisService {
         try {
             await dbClient.query('BEGIN');
             
+            // ✅ Vérifier que l'événement existe
+            const evenement = await Evenement.findById(idEvenement);
+            if (!evenement) {
+                throw new Error('Événement non trouvé');
+            }
+
+            // ✅ Optionnel : Vérifier qu'il n'y a pas déjà un devis actif
+            const devisExistants = await Devis.findByEvenement(idEvenement);
+            const devisActif = devisExistants.find(d => 
+                !['refuse', 'annule'].includes(d.statut_devis)
+            );
+            if (devisActif) {
+                throw new Error(`Un devis actif existe déjà pour cet événement (${devisActif.numero_devis})`);
+            }
+
             const numeroDevis = await Devis.generateNumero();
             const devis = await Devis.create({
                 numero_devis: numeroDevis,
@@ -78,6 +94,11 @@ class DevisService {
                 }
             }
 
+            // ✅ Si statut "modification", repasser en "brouillon" après modif
+            if (devis.statut_devis === 'modification') {
+                await Devis.update(id, { statut_devis: 'brouillon', motif_modification: null });
+            }
+
             await dbClient.query('COMMIT');
             return this.getById(id);
         } catch (error) {
@@ -110,10 +131,19 @@ class DevisService {
             throw new Error('Non autorisé');
         }
 
+        // ✅ Vérifier que le devis peut être accepté
+        if (!['etude_client', 'envoye'].includes(devis.statut_devis)) {
+            throw new Error('Ce devis ne peut pas être accepté');
+        }
+
         await Devis.updateStatut(id, 'accepte');
+        
+        // ✅ AJOUT : Mettre à jour le statut de l'événement
+        await Evenement.updateStatut(devis.id_evenement, 'confirme');
+        
         try {
             await EmailService.sendDevisResponse(devis, 'accepte');
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error('Erreur email acceptation:', e.message); }
         
         return this.getById(id);
     }
@@ -125,16 +155,22 @@ class DevisService {
             throw new Error('Non autorisé');
         }
 
+        // ✅ Vérifier que le devis peut être refusé
+        if (!['etude_client', 'envoye'].includes(devis.statut_devis)) {
+            throw new Error('Ce devis ne peut pas être refusé');
+        }
+
         await Devis.updateStatut(id, 'refuse');
+        
         try {
             await EmailService.sendDevisResponse(devis, 'refuse');
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error('Erreur email refus:', e.message); }
         
         return this.getById(id);
     }
 
     static async requestModification(id, idUtilisateur, motif) {
-        if (!motif) throw new Error('Motif obligatoire');
+        if (!motif || !motif.trim()) throw new Error('Motif obligatoire');
         
         const devis = await this.getById(id);
         const client = await Client.findByUserId(idUtilisateur);
@@ -142,10 +178,16 @@ class DevisService {
             throw new Error('Non autorisé');
         }
 
-        await Devis.updateStatut(id, 'modification', motif);
+        // ✅ Vérifier que le devis peut être modifié
+        if (!['etude_client', 'envoye'].includes(devis.statut_devis)) {
+            throw new Error('Ce devis ne peut pas être modifié');
+        }
+
+        await Devis.updateStatut(id, 'modification', motif.trim());
+        
         try {
-            await EmailService.sendDevisResponse(devis, 'modification', motif);
-        } catch (e) { console.error(e); }
+            await EmailService.sendDevisResponse(devis, 'modification', motif.trim());
+        } catch (e) { console.error('Erreur email modification:', e.message); }
         
         return this.getById(id);
     }

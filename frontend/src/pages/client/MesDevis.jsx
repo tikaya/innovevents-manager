@@ -6,7 +6,8 @@ import {
   Download,
   Check,
   X,
-  MessageSquare
+  MessageSquare,
+  Clock
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -129,7 +130,7 @@ const MesDevis = () => {
       etude_client: { color: 'bg-yellow-100 text-yellow-700', label: 'À étudier' },
       accepte: { color: 'bg-green-100 text-green-700', label: 'Accepté' },
       refuse: { color: 'bg-red-100 text-red-700', label: 'Refusé' },
-      modifie: { color: 'bg-purple-100 text-purple-700', label: 'Modification demandée' }
+      modification: { color: 'bg-purple-100 text-purple-700', label: 'En cours de modification' }
     };
 
     const { color, label } = config[statut] || { color: 'bg-gray-100', label: statut };
@@ -137,6 +138,12 @@ const MesDevis = () => {
   };
 
   const canRespond = (statut) => ['envoye', 'etude_client'].includes(statut);
+
+  // Indicateur visuel pour les devis nécessitant une action
+  const needsAction = (statut) => ['envoye', 'etude_client'].includes(statut);
+  
+  // Indicateur pour modification en cours
+  const isModificationPending = (statut) => statut === 'modification';
 
   return (
     <div className="space-y-6">
@@ -162,7 +169,9 @@ const MesDevis = () => {
             <div 
               key={d.id_devis} 
               className={`card hover:shadow-lg transition-shadow ${
-                canRespond(d.statut_devis) ? 'border-l-4 border-l-or' : ''
+                needsAction(d.statut_devis) ? 'border-l-4 border-l-or' : ''
+              } ${
+                isModificationPending(d.statut_devis) ? 'border-l-4 border-l-purple-500' : ''
               }`}
             >
               <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -174,6 +183,14 @@ const MesDevis = () => {
                   </div>
                   <p className="text-gray-600">{d.nom_evenement}</p>
                   <p className="text-sm text-gray-500">Reçu le {formatDate(d.date_creation_devis)}</p>
+                  
+                  {/* Message modification en cours dans la liste */}
+                  {isModificationPending(d.statut_devis) && (
+                    <div className="flex items-center gap-2 mt-2 text-purple-600 text-sm">
+                      <Clock className="w-4 h-4" />
+                      <span>Modification en cours de traitement</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions */}
@@ -216,10 +233,58 @@ const MesDevis = () => {
             </div>
 
             <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-4">
                 {getStatutBadge(selectedDevis.statut_devis)}
                 <p className="text-sm text-gray-500">Créé le {formatDate(selectedDevis.date_creation_devis)}</p>
               </div>
+
+              {/* Message si modification en cours */}
+              {selectedDevis.statut_devis === 'modification' && (
+                <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-btn">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock className="w-5 h-5 text-purple-600" />
+                    <p className="font-semibold text-purple-700">Modification en cours</p>
+                  </div>
+                  <p className="text-purple-600 text-sm mb-3">
+                    Votre demande a été transmise. L'équipe Innov'Events travaille sur les modifications. 
+                    Vous recevrez un email dès que le nouveau devis sera disponible.
+                  </p>
+                  {selectedDevis.motif_modification && (
+                    <div className="pt-3 border-t border-purple-200">
+                      <p className="text-xs text-purple-500 mb-1">Votre demande :</p>
+                      <p className="text-purple-700 text-sm bg-purple-100 p-3 rounded-btn italic">
+                        "{selectedDevis.motif_modification}"
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Message si accepté */}
+              {selectedDevis.statut_devis === 'accepte' && (
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-btn">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-600" />
+                    <p className="font-semibold text-green-700">Devis accepté</p>
+                  </div>
+                  <p className="text-green-600 text-sm mt-1">
+                    Merci pour votre confiance ! Notre équipe va prendre contact avec vous pour la suite.
+                  </p>
+                </div>
+              )}
+
+              {/* Message si refusé */}
+              {selectedDevis.statut_devis === 'refuse' && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-btn">
+                  <div className="flex items-center gap-2">
+                    <X className="w-5 h-5 text-red-600" />
+                    <p className="font-semibold text-red-700">Devis refusé</p>
+                  </div>
+                  <p className="text-red-600 text-sm mt-1">
+                    Ce devis a été refusé. N'hésitez pas à nous contacter pour un nouveau projet.
+                  </p>
+                </div>
+              )}
 
               {/* Prestations */}
               <div className="border rounded-btn overflow-hidden mb-6">
@@ -259,7 +324,7 @@ const MesDevis = () => {
                 </div>
               </div>
 
-              {/* Actions */}
+              {/* Actions si le client peut répondre */}
               {canRespond(selectedDevis.statut_devis) && (
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
@@ -289,6 +354,7 @@ const MesDevis = () => {
                 </div>
               )}
 
+              {/* Actions si pas de réponse possible */}
               {!canRespond(selectedDevis.statut_devis) && (
                 <button
                   onClick={() => handleDownloadPDF(selectedDevis.id_devis)}
@@ -311,14 +377,17 @@ const MesDevis = () => {
               <h2 className="text-xl font-montserrat font-bold text-gris-ardoise">
                 Demander une modification
               </h2>
+              <p className="text-gray-500 text-sm mt-1">
+                Décrivez les modifications souhaitées, notre équipe vous enverra un nouveau devis.
+              </p>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="label">Motif de la modification</label>
+                <label className="label">Motif de la modification *</label>
                 <textarea
                   className="input-field"
                   rows="4"
-                  placeholder="Décrivez les modifications souhaitées..."
+                  placeholder="Ex: Je souhaiterais ajouter une prestation traiteur pour 50 personnes..."
                   value={motifModification}
                   onChange={(e) => setMotifModification(e.target.value)}
                 />
@@ -327,15 +396,16 @@ const MesDevis = () => {
                 <button
                   onClick={() => { setShowModifyModal(false); setMotifModification(''); }}
                   className="btn-secondary flex-1"
+                  disabled={processing}
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleRequestModify}
-                  disabled={processing}
-                  className="btn-primary flex-1"
+                  disabled={processing || !motifModification.trim()}
+                  className={`btn-primary flex-1 ${(!motifModification.trim() || processing) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  {processing ? 'Envoi...' : 'Envoyer'}
+                  {processing ? 'Envoi...' : 'Envoyer la demande'}
                 </button>
               </div>
             </div>
