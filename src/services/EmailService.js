@@ -30,28 +30,34 @@ class EmailService {
     /**
      * Envoie un email (NON-BLOQUANT en cas d'erreur)
      */
-    static async send(options) {
-        if (!this.resend) {
-            this.init();
-        }
-
-        try {
-            const result = await this.resend.emails.send({
-                from: process.env.RESEND_FROM || "Innov'Events <onboarding@resend.dev>",
-                to: [options.to],
-                subject: options.subject,
-                text: options.text,
-                html: options.html,
-                attachments: options.attachments || []
-            });
-            console.log('📧 Email envoyé via Resend:', result.data?.id);
-            return result;
-        } catch (error) {
-            console.error('❌ Erreur envoi email Resend:', error.message);
-            return null;
-        }
+ static async send(options) {
+    if (!this.resend) {
+        this.init();
     }
 
+    try {
+        const result = await this.resend.emails.send({
+            from: process.env.RESEND_FROM || "Innov'Events <onboarding@resend.dev>",
+            to: [options.to],
+            subject: options.subject,
+            text: options.text,
+            html: options.html,
+            attachments: options.attachments || []
+        });
+        
+        // ✅ Vérifier si Resend a retourné une erreur
+        if (result.error) {
+            console.error('❌ Erreur Resend:', result.error.message, '| To:', options.to);
+            return null;
+        }
+        
+        console.log('📧 Email envoyé via Resend:', result.data?.id, '| To:', options.to);
+        return result;
+    } catch (error) {
+        console.error('❌ Erreur envoi email Resend:', error.message, '| To:', options.to);
+        return null;
+    }
+}
     /**
      * Template de base pour tous les emails
      */
