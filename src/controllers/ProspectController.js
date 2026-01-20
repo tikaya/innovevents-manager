@@ -82,7 +82,20 @@ const convert = asyncHandler(async (req, res) => {
 });
 
 const remove = asyncHandler(async (req, res) => {
+    const prospect = await ProspectService.getById(req.params.id);
     await ProspectService.delete(req.params.id);
+    
+    // ✅ AJOUT Log suppression
+    await LogService.log(
+        ACTION_TYPES.SUPPRESSION_PROSPECT,
+        req.user.id_utilisateur,
+        { 
+            id_prospect: parseInt(req.params.id),
+            nom_entreprise: prospect.nom_entreprise
+        },
+        req.clientIp
+    );
+    
     res.json({ success: true, message: 'Prospect supprimé' });
 });
 

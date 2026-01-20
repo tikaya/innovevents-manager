@@ -1,24 +1,38 @@
 /**
  * Service Client
  * @module services/ClientService
+ * 
+ * Conforme RGPD :
+ * - Anonymisation des logs lors de la suppression
+ * - Vérification des événements actifs avant suppression
  */
 
 const Client = require('../models/Client');
 const Utilisateur = require('../models/Utilisateur');
 const EmailService = require('./EmailService');
+const { LogService } = require('./LogService');
 const { getClient } = require('../config/database');
 
 class ClientService {
+    /**
+     * Récupère tous les clients avec filtres optionnels
+     */
     static async getAll(filters = {}) {
         return Client.findAll(filters);
     }
 
+    /**
+     * Récupère un client par son ID
+     */
     static async getById(id) {
         const client = await Client.findById(id);
         if (!client) throw new Error('Client non trouvé');
         return client;
     }
 
+    /**
+     * Récupère un client par l'ID utilisateur
+     */
     static async getByUserId(idUtilisateur) {
         const client = await Client.findByUserId(idUtilisateur);
         if (!client) throw new Error('Client non trouvé');
@@ -27,6 +41,9 @@ class ClientService {
 
     /**
      * Génère un nom d'utilisateur unique
+     * @param {string} prenom - Prénom du contact
+     * @param {string} nom - Nom du contact
+     * @returns {string} Nom d'utilisateur unique
      */
     static async generateUsername(prenom, nom) {
         let nomUtilisateur = `${prenom.toLowerCase()}_${nom.toLowerCase()}`
@@ -46,6 +63,8 @@ class ClientService {
 
     /**
      * Crée un client avec son compte utilisateur
+     * @param {object} data - Données du client
+     * @returns {object} Client créé et mot de passe temporaire
      */
     static async create(data) {
         // Vérifier si l'email existe déjà dans client
@@ -111,6 +130,9 @@ class ClientService {
 
     /**
      * Crée un client depuis un prospect (sans créer de nouveau compte si déjà existant)
+     * @param {object} data - Données du client
+     * @param {number|null} idUtilisateur - ID utilisateur existant (optionnel)
+     * @returns {object} Client créé
      */
     static async createFromProspect(data, idUtilisateur = null) {
         const existingClient = await Client.findByEmail(data.email_client);
@@ -153,6 +175,12 @@ class ClientService {
         return Client.create({ ...data, id_utilisateur: idUtilisateur });
     }
 
+    /**
+     * Met à jour un client
+     * @param {number} id - ID du client
+     * @param {object} data - Données à mettre à jour
+     * @returns {object} Client mis à jour
+     */
     static async update(id, data) {
         const client = await Client.findById(id);
         if (!client) throw new Error('Client non trouvé');
@@ -183,19 +211,57 @@ class ClientService {
         return updatedClient;
     }
 
+    /**
+     * Supprime un client et ses données associées
+     * Conforme RGPD : anonymise les logs avant suppression
+     * 
+     * @param {number} id - ID du client
+     * @returns {boolean} Succès de la suppression
+     */
     static async delete(id) {
         const client = await Client.findById(id);
         if (!client) throw new Error('Client non trouvé');
 
+        // ✅ RGPD : Vérifier s'il y a des événements actifs
+        const evenements = await Client.getEvenements(id);
+        if (evenements && evenements.length > 0) {
+            const evenementsActifs = evenements.filter(e => 
+                ['confirme', 'planifie', 'en_cours'].includes(e.statut_evenement)
+            );
+            if (evenementsActifs.length > 0) {
+                throw new Error(`Impossible de supprimer ce client : ${evenementsActifs.length} événement(s) en cours`);
+            }
+        }
+
         const dbClient = await getClient();
         try {
             await dbClient.query('BEGIN');
+            
+            // ✅ RGPD : Anonymiser les logs AVANT de supprimer l'utilisateur
+            // L'IP est une donnée personnelle selon le RGPD
+            if (client.id_utilisateur) {
+                try {
+                    await LogService.anonymizeUserLogs(client.id_utilisateur);
+                    console.log(`🔒 RGPD: Logs anonymisés pour client ${id} (user: ${client.id_utilisateur})`);
+                } catch (logError) {
+                    console.error('⚠️ Erreur anonymisation logs (non bloquant):', logError.message);
+                    // On continue même si l'anonymisation échoue
+                }
+            }
+            
+            // Supprimer le client (cascade sur événements si configuré)
             await Client.delete(id);
+            
+            // Supprimer l'utilisateur associé
             if (client.id_utilisateur) {
                 await Utilisateur.delete(client.id_utilisateur);
             }
+            
             await dbClient.query('COMMIT');
+            
+            console.log(`✅ Client ${id} supprimé (RGPD compliant)`);
             return true;
+            
         } catch (error) {
             await dbClient.query('ROLLBACK');
             throw error;
@@ -206,6 +272,8 @@ class ClientService {
 
     /**
      * Réinitialise le mot de passe d'un client
+     * @param {number} id - ID du client
+     * @returns {object} Client et nouveau mot de passe temporaire
      */
     static async resetPassword(id) {
         const client = await Client.findById(id);
@@ -229,35 +297,88 @@ class ClientService {
         return { client, tempPassword };
     }
 
+    /**
+     * Recherche de clients par terme
+     * @param {string} term - Terme de recherche
+     * @returns {Array} Clients correspondants
+     */
     static async search(term) {
         return Client.search(term);
     }
 
+    /**
+     * Récupère les événements d'un client
+     * @param {number} idClient - ID du client
+     * @returns {Array} Événements du client
+     */
     static async getEvenements(idClient) {
         return Client.getEvenements(idClient);
     }
 
+    /**
+     * Compte les clients actifs
+     * @returns {number} Nombre de clients actifs
+     */
     static async countActifs() {
         return Client.countActifs();
     }
 
     /**
-     * Génère un mot de passe temporaire
+     * Génère un mot de passe temporaire sécurisé
+     * Contient au moins : 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial
+     * 
+     * @returns {string} Mot de passe temporaire (12 caractères)
      */
     static generateTempPassword() {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
         let password = '';
         
+        // Garantir au moins un de chaque type
         password += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 26)];
         password += 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 26)];
         password += '0123456789'[Math.floor(Math.random() * 10)];
         password += '!@#$%'[Math.floor(Math.random() * 5)];
         
+        // Compléter à 12 caractères
         for (let i = 0; i < 8; i++) {
             password += chars[Math.floor(Math.random() * chars.length)];
         }
         
+        // Mélanger les caractères
         return password.split('').sort(() => Math.random() - 0.5).join('');
+    }
+
+    /**
+     * ============================================
+     * FONCTIONS RGPD
+     * ============================================
+     */
+
+    /**
+     * Exporte toutes les données d'un client (RGPD - Droit d'accès / Portabilité)
+     * @param {number} idClient - ID du client
+     * @returns {object} Données exportées
+     */
+    static async exportDataRGPD(idClient) {
+        const client = await this.getById(idClient);
+        const evenements = await this.getEvenements(idClient);
+        
+        let logs = [];
+        if (client.id_utilisateur) {
+            logs = await LogService.exportUserLogs(client.id_utilisateur);
+        }
+        
+        return {
+            client,
+            evenements,
+            logs,
+            export_date: new Date().toISOString(),
+            rgpd_info: {
+                droit: 'Portabilité des données (Art. 20 RGPD)',
+                format: 'JSON',
+                responsable: 'Innov\'Events'
+            }
+        };
     }
 }
 

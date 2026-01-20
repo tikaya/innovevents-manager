@@ -1,60 +1,100 @@
 /**
  * Service de Journalisation (MongoDB)
  * @module services/LogService
+ * 
+ * Conforme RGPD :
+ * - Anonymisation des données personnelles sur demande
+ * - Purge automatique des logs anciens
+ * - Export des données utilisateur
  */
 
 const { getDB } = require('../config/mongodb');
 
 // Types d'actions standardisés
 const ACTION_TYPES = {
-    // Authentification
+    // ============================================
+    // AUTHENTIFICATION
+    // ============================================
     CONNEXION_REUSSIE: 'CONNEXION_REUSSIE',
     CONNEXION_ECHOUEE: 'CONNEXION_ECHOUEE',
     DECONNEXION: 'DECONNEXION',
     MOT_DE_PASSE_OUBLIE: 'MOT_DE_PASSE_OUBLIE',
     CHANGEMENT_MOT_DE_PASSE: 'CHANGEMENT_MOT_DE_PASSE',
     
-    // Clients
+    // ============================================
+    // CLIENTS
+    // ============================================
     CREATION_CLIENT: 'CREATION_CLIENT',
     MODIFICATION_CLIENT: 'MODIFICATION_CLIENT',
     SUPPRESSION_CLIENT: 'SUPPRESSION_CLIENT',
+    RESET_PASSWORD_CLIENT: 'RESET_PASSWORD_CLIENT',
     
-    // Événements
+    // ============================================
+    // ÉVÉNEMENTS
+    // ============================================
     CREATION_EVENEMENT: 'CREATION_EVENEMENT',
     MODIFICATION_EVENEMENT: 'MODIFICATION_EVENEMENT',
     MODIFICATION_STATUT_EVENEMENT: 'MODIFICATION_STATUT_EVENEMENT',
     SUPPRESSION_EVENEMENT: 'SUPPRESSION_EVENEMENT',
     
-    // Devis
+    // ============================================
+    // DEVIS
+    // ============================================
     CREATION_DEVIS: 'CREATION_DEVIS',
+    MODIFICATION_DEVIS: 'MODIFICATION_DEVIS',
+    SUPPRESSION_DEVIS: 'SUPPRESSION_DEVIS',
     GENERATION_DEVIS_PDF: 'GENERATION_DEVIS_PDF',
     ENVOI_DEVIS_EMAIL: 'ENVOI_DEVIS_EMAIL',
     ACCEPTATION_DEVIS: 'ACCEPTATION_DEVIS',
     REFUS_DEVIS: 'REFUS_DEVIS',
-    MODIFICATION_DEVIS: 'MODIFICATION_DEVIS',
+    DEMANDE_MODIFICATION_DEVIS: 'DEMANDE_MODIFICATION_DEVIS',
     
-    // Prospects
+    // ============================================
+    // PROSPECTS
+    // ============================================
     CREATION_PROSPECT: 'CREATION_PROSPECT',
+    MODIFICATION_PROSPECT: 'MODIFICATION_PROSPECT',
+    SUPPRESSION_PROSPECT: 'SUPPRESSION_PROSPECT',
     CONVERSION_PROSPECT: 'CONVERSION_PROSPECT',
     REJET_PROSPECT: 'REJET_PROSPECT',
     
-    // Employés
+    // ============================================
+    // EMPLOYÉS
+    // ============================================
     CREATION_EMPLOYE: 'CREATION_EMPLOYE',
     MODIFICATION_EMPLOYE: 'MODIFICATION_EMPLOYE',
     SUPPRESSION_EMPLOYE: 'SUPPRESSION_EMPLOYE',
     RESET_PASSWORD_EMPLOYE: 'RESET_PASSWORD_EMPLOYE',
     
-    // Avis
+    // ============================================
+    // AVIS
+    // ============================================
+    CREATION_AVIS: 'CREATION_AVIS',
     VALIDATION_AVIS: 'VALIDATION_AVIS',
     REFUS_AVIS: 'REFUS_AVIS',
+    SUPPRESSION_AVIS: 'SUPPRESSION_AVIS',
     
-    // Notes
+    // ============================================
+    // NOTES
+    // ============================================
     CREATION_NOTE: 'CREATION_NOTE',
     MODIFICATION_NOTE: 'MODIFICATION_NOTE',
     SUPPRESSION_NOTE: 'SUPPRESSION_NOTE',
     
-    // Tâches
-    MODIFICATION_STATUT_TACHE: 'MODIFICATION_STATUT_TACHE'
+    // ============================================
+    // TÂCHES
+    // ============================================
+    CREATION_TACHE: 'CREATION_TACHE',
+    MODIFICATION_TACHE: 'MODIFICATION_TACHE',
+    MODIFICATION_STATUT_TACHE: 'MODIFICATION_STATUT_TACHE',
+    SUPPRESSION_TACHE: 'SUPPRESSION_TACHE',
+    
+    // ============================================
+    // RGPD
+    // ============================================
+    EXPORT_DONNEES_RGPD: 'EXPORT_DONNEES_RGPD',
+    SUPPRESSION_COMPTE_RGPD: 'SUPPRESSION_COMPTE_RGPD',
+    ANONYMISATION_LOGS_RGPD: 'ANONYMISATION_LOGS_RGPD'
 };
 
 class LogService {
@@ -63,7 +103,7 @@ class LogService {
      * @param {string} typeAction - Type d'action (voir ACTION_TYPES)
      * @param {number|null} idUtilisateur - ID de l'utilisateur
      * @param {object} details - Détails contextuels
-     * @param {string|null} ipAddress - Adresse IP (optionnel)
+     * @param {string|null} ipAddress - Adresse IP (optionnel, RGPD)
      */
     static async log(typeAction, idUtilisateur = null, details = {}, ipAddress = null) {
         try {
@@ -76,6 +116,8 @@ class LogService {
                 id_utilisateur: idUtilisateur,
                 details: {
                     ...details,
+                    // Note RGPD: L'IP est une donnée personnelle
+                    // Elle sera anonymisée lors de la suppression du compte
                     ...(ipAddress && { ip_address: ipAddress })
                 }
             };
@@ -125,7 +167,8 @@ class LogService {
                 query.$or = [
                     { 'details.nom': { $regex: filters.search, $options: 'i' } },
                     { 'details.email': { $regex: filters.search, $options: 'i' } },
-                    { 'details.nom_evenement': { $regex: filters.search, $options: 'i' } }
+                    { 'details.nom_evenement': { $regex: filters.search, $options: 'i' } },
+                    { 'details.nom_entreprise': { $regex: filters.search, $options: 'i' } }
                 ];
             }
             
@@ -198,6 +241,164 @@ class LogService {
             };
         } catch (error) {
             console.error('❌ Erreur stats logs:', error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Récupère les logs d'un utilisateur spécifique
+     * @param {number} idUtilisateur - ID de l'utilisateur
+     */
+    static async getByUserId(idUtilisateur) {
+        try {
+            const db = getDB();
+            const logsCollection = db.collection('logs');
+            
+            const logs = await logsCollection
+                .find({ id_utilisateur: parseInt(idUtilisateur) })
+                .sort({ horodatage: -1 })
+                .toArray();
+            
+            return logs;
+        } catch (error) {
+            console.error('❌ Erreur récupération logs utilisateur:', error.message);
+            throw error;
+        }
+    }
+
+    // ============================================
+    // FONCTIONS RGPD
+    // ============================================
+
+    /**
+     * Anonymise les logs d'un utilisateur (RGPD - Droit à l'effacement)
+     * Conserve les logs pour l'historique mais supprime les données personnelles
+     * 
+     * @param {number} idUtilisateur - ID de l'utilisateur à anonymiser
+     * @returns {number} Nombre de logs anonymisés
+     */
+    static async anonymizeUserLogs(idUtilisateur) {
+        try {
+            const db = getDB();
+            const logsCollection = db.collection('logs');
+            
+            const result = await logsCollection.updateMany(
+                { id_utilisateur: parseInt(idUtilisateur) },
+                { 
+                    $set: { 
+                        'details.ip_address': 'ANONYMIZED',
+                        'details.email': 'ANONYMIZED',
+                        'details.nom': 'ANONYMIZED',
+                        'details.prenom': 'ANONYMIZED',
+                        'details.telephone': 'ANONYMIZED',
+                        'details.nom_contact': 'ANONYMIZED',
+                        'details.prenom_contact': 'ANONYMIZED',
+                        id_utilisateur: null,
+                        anonymise: true,
+                        date_anonymisation: new Date()
+                    }
+                }
+            );
+            
+            console.log(`🔒 RGPD: ${result.modifiedCount} logs anonymisés pour utilisateur ${idUtilisateur}`);
+            
+            // Log l'action d'anonymisation (sans données personnelles)
+            await this.log(
+                ACTION_TYPES.ANONYMISATION_LOGS_RGPD,
+                null,
+                { 
+                    ancien_id_utilisateur: idUtilisateur,
+                    nombre_logs_anonymises: result.modifiedCount
+                }
+            );
+            
+            return result.modifiedCount;
+        } catch (error) {
+            console.error('❌ Erreur anonymisation logs:', error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Purge les logs de plus de X mois (RGPD - Limitation de conservation)
+     * Recommandation : 24 mois pour les logs d'activité
+     * 
+     * @param {number} months - Nombre de mois de rétention (défaut: 24)
+     * @returns {number} Nombre de logs purgés
+     */
+    static async purgeOldLogs(months = 24) {
+        try {
+            const db = getDB();
+            const logsCollection = db.collection('logs');
+            
+            const dateLimit = new Date();
+            dateLimit.setMonth(dateLimit.getMonth() - months);
+            
+            // Compter avant suppression
+            const countBefore = await logsCollection.countDocuments({
+                horodatage: { $lt: dateLimit }
+            });
+            
+            if (countBefore === 0) {
+                console.log(`🗑️ RGPD: Aucun log à purger (> ${months} mois)`);
+                return 0;
+            }
+            
+            const result = await logsCollection.deleteMany({
+                horodatage: { $lt: dateLimit }
+            });
+            
+            console.log(`🗑️ RGPD: ${result.deletedCount} logs purgés (> ${months} mois)`);
+            
+            // Log l'action de purge
+            await this.log(
+                ACTION_TYPES.ANONYMISATION_LOGS_RGPD,
+                null,
+                { 
+                    action: 'PURGE_OLD_LOGS',
+                    nombre_logs_purges: result.deletedCount,
+                    retention_mois: months,
+                    date_limite: dateLimit.toISOString()
+                }
+            );
+            
+            return result.deletedCount;
+        } catch (error) {
+            console.error('❌ Erreur purge logs:', error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * Exporte les logs d'un utilisateur (RGPD - Droit d'accès / Portabilité)
+     * 
+     * @param {number} idUtilisateur - ID de l'utilisateur
+     * @returns {Array} Logs de l'utilisateur
+     */
+    static async exportUserLogs(idUtilisateur) {
+        try {
+            const db = getDB();
+            const logsCollection = db.collection('logs');
+            
+            const logs = await logsCollection
+                .find({ id_utilisateur: parseInt(idUtilisateur) })
+                .sort({ horodatage: -1 })
+                .toArray();
+            
+            // Log l'action d'export
+            await this.log(
+                ACTION_TYPES.EXPORT_DONNEES_RGPD,
+                idUtilisateur,
+                { 
+                    nombre_logs_exportes: logs.length
+                }
+            );
+            
+            console.log(`📤 RGPD: ${logs.length} logs exportés pour utilisateur ${idUtilisateur}`);
+            
+            return logs;
+        } catch (error) {
+            console.error('❌ Erreur export logs:', error.message);
             throw error;
         }
     }

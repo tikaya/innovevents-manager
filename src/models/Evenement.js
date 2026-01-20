@@ -211,7 +211,7 @@ class Evenement {
             FROM evenement e
             INNER JOIN client c ON e.id_client = c.id_client
             WHERE e.date_debut >= CURRENT_DATE
-              AND e.statut_evenement NOT IN ('termine', 'annuler')
+              AND e.statut_evenement NOT IN ('termine', 'annule')
         `;
         const params = [];
 
