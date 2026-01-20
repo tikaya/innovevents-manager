@@ -100,7 +100,7 @@ const Prospects = () => {
     if (!confirm('Voulez-vous vraiment marquer ce prospect comme échoué ?')) return;
 
     try {
-      await api.patch(`/prospects/${id}/reject`, { message_echec: 'Refusé par l\'administrateur' });
+await api.post(`/prospects/${id}/reject`, { message_echec: 'Refusé par l\'administrateur' });
       toast.success('Prospect marqué comme échoué');
       fetchProspects();
     } catch (err) {

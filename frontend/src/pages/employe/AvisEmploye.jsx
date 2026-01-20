@@ -40,7 +40,7 @@ const handleRefuser = async (id) => {
   if (!confirm('Refuser cet avis ?')) return;
   
   try {
-    await api.patch(`/avis/${id}/reject`);
+    await api.post(`/avis/${id}/reject`);
     toast.success('Avis refusé');
     fetchAvis();
   } catch (err) {

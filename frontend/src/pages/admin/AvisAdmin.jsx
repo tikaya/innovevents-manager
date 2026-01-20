@@ -56,7 +56,7 @@ const AvisAdmin = () => {
     if (!confirm('Voulez-vous vraiment refuser cet avis ?')) return;
     
     try {
-      await api.patch(`/avis/${id}/reject`);
+      await api.post(`/avis/${id}/reject`);
       toast.success('Avis refusé');
       fetchAvis();
     } catch (err) {
