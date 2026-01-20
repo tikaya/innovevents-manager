@@ -1,12 +1,12 @@
 /**
- * Service d'envoi d'emails avec Resend
+ * Service d'envoi d'emails avec Nodemailer (SMTP)
  * @module services/EmailService
  */
 
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
 class EmailService {
-    static resend = null;
+    static transporter = null;
 
     // Couleurs de la charte graphique
     static colors = {
@@ -21,43 +21,50 @@ class EmailService {
     };
 
     /**
-     * Initialise Resend
+     * Initialise le transporteur SMTP
      */
     static init() {
-        this.resend = new Resend(process.env.RESEND_API_KEY);
+        this.transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: parseInt(process.env.SMTP_PORT),
+            secure: process.env.SMTP_PORT === '465',
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS
+            }
+        });
+        console.log('📧 SMTP initialisé:', process.env.SMTP_HOST);
     }
 
     /**
      * Envoie un email (NON-BLOQUANT en cas d'erreur)
      */
- static async send(options) {
-    if (!this.resend) {
-        this.init();
-    }
+    static async send(options) {
+        if (!this.transporter) {
+            this.init();
+        }
 
-    try {
-        const result = await this.resend.emails.send({
-            from: process.env.RESEND_FROM || "Innov'Events <onboarding@resend.dev>",
-            to: [options.to],
-            subject: options.subject,
-            text: options.text,
-            html: options.html,
-            attachments: options.attachments || []
-        });
-        
-        // ✅ Vérifier si Resend a retourné une erreur
-        if (result.error) {
-            console.error('❌ Erreur Resend:', result.error.message, '| To:', options.to);
+        try {
+            const fromName = process.env.SMTP_FROM_NAME || "Innov'Events";
+            const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER;
+            
+            const result = await this.transporter.sendMail({
+                from: `"${fromName}" <${fromEmail}>`,
+                to: options.to,
+                subject: options.subject,
+                text: options.text,
+                html: options.html,
+                attachments: options.attachments || []
+            });
+            
+            console.log('📧 Email envoyé:', result.messageId, '| To:', options.to);
+            return result;
+        } catch (error) {
+            console.error('❌ Erreur envoi email:', error.message, '| To:', options.to);
             return null;
         }
-        
-        console.log('📧 Email envoyé via Resend:', result.data?.id, '| To:', options.to);
-        return result;
-    } catch (error) {
-        console.error('❌ Erreur envoi email Resend:', error.message, '| To:', options.to);
-        return null;
     }
-}
+
     /**
      * Template de base pour tous les emails
      */
@@ -419,7 +426,7 @@ class EmailService {
             html,
             attachments: [{
                 filename: `${devis.numero_devis}.pdf`,
-                content: pdfBuffer.toString('base64')
+                content: pdfBuffer
             }]
         });
     }
