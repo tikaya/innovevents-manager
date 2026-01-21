@@ -335,4 +335,4 @@ npm run test:coverage
 
 ---
 
-Développé avec ❤️ pour le projet Innov'Events
+Développé avec ❤️ par TIKAYA pour le projet Innov'Events
