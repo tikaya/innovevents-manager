@@ -16,7 +16,7 @@ class Tache {
                    e.nom_evenement
             FROM tache t
             INNER JOIN utilisateur u ON t.id_utilisateur = u.id_utilisateur
-            INNER JOIN evenement e ON t.id_evenement = e.id_evenement
+            LEFT JOIN evenement e ON t.id_evenement = e.id_evenement
             WHERE 1=1
         `;
         const params = [];
@@ -64,7 +64,7 @@ class Tache {
         const sql = `
             SELECT t.*, e.nom_evenement
             FROM tache t
-            INNER JOIN evenement e ON t.id_evenement = e.id_evenement
+            LEFT JOIN evenement e ON t.id_evenement = e.id_evenement
             WHERE t.id_utilisateur = $1
             ORDER BY t.date_echeance ASC NULLS LAST
         `;
@@ -82,7 +82,7 @@ class Tache {
                    e.nom_evenement
             FROM tache t
             INNER JOIN utilisateur u ON t.id_utilisateur = u.id_utilisateur
-            INNER JOIN evenement e ON t.id_evenement = e.id_evenement
+            LEFT JOIN evenement e ON t.id_evenement = e.id_evenement
             WHERE t.id_tache = $1
         `;
         const result = await query(sql, [id]);
@@ -103,7 +103,7 @@ class Tache {
             VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *
         `;
-        const params = [titre_tache, description_tache || null, statut_tache, date_echeance || null, id_utilisateur, id_evenement];
+        const params = [titre_tache, description_tache || null, statut_tache, date_echeance || null, id_utilisateur, id_evenement || null];
         const result = await query(sql, params);
         return result.rows[0];
     }
@@ -116,7 +116,7 @@ class Tache {
         const params = [];
         let paramIndex = 1;
 
-        const allowedFields = ['titre_tache', 'description_tache', 'statut_tache', 'date_echeance', 'id_utilisateur'];
+        const allowedFields = ['titre_tache', 'description_tache', 'statut_tache', 'date_echeance', 'id_utilisateur', 'id_evenement'];
 
         for (const [key, value] of Object.entries(data)) {
             if (allowedFields.includes(key) && value !== undefined) {
@@ -167,7 +167,7 @@ class Tache {
                    e.nom_evenement
             FROM tache t
             INNER JOIN utilisateur u ON t.id_utilisateur = u.id_utilisateur
-            INNER JOIN evenement e ON t.id_evenement = e.id_evenement
+            LEFT JOIN evenement e ON t.id_evenement = e.id_evenement
             WHERE t.date_echeance < CURRENT_DATE
               AND t.statut_tache != 'termine'
             ORDER BY t.date_echeance ASC

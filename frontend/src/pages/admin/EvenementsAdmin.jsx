@@ -4,11 +4,14 @@ import {
   Search, 
   Plus, 
   Eye, 
+  EyeOff,
   Edit,
   Trash2,
   Calendar,
   MapPin,
-  X
+  X,
+  Globe,
+  Lock
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -33,7 +36,9 @@ const EvenementsAdmin = () => {
     type_evenement: '',
     theme_evenement: '',
     statut_evenement: 'brouillon',
-    id_client: ''
+    id_client: '',
+    visible_public: false,
+    accord_client_affichage: false
   });
 
   const statuts = [
@@ -84,7 +89,9 @@ const EvenementsAdmin = () => {
       type_evenement: '',
       theme_evenement: '',
       statut_evenement: 'brouillon',
-      id_client: ''
+      id_client: '',
+      visible_public: false,
+      accord_client_affichage: false
     });
     setShowFormModal(true);
   };
@@ -101,7 +108,9 @@ const EvenementsAdmin = () => {
       type_evenement: event.type_evenement || '',
       theme_evenement: event.theme_evenement || '',
       statut_evenement: event.statut_evenement || 'brouillon',
-      id_client: event.id_client || ''
+      id_client: event.id_client || '',
+      visible_public: event.visible_public || false,
+      accord_client_affichage: event.accord_client_affichage || false
     });
     setShowFormModal(true);
   };
@@ -125,7 +134,8 @@ const EvenementsAdmin = () => {
     try {
       const payload = {
         ...formData,
-        id_client: formData.id_client ? parseInt(formData.id_client) : null
+        id_client: formData.id_client ? parseInt(formData.id_client) : null,
+        visible_public: formData.accord_client_affichage ? formData.visible_public : false
       };
 
       if (selectedEvent) {
@@ -167,6 +177,23 @@ const EvenementsAdmin = () => {
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${s?.color || 'bg-gray-100'}`}>
         {s?.label || statut}
+      </span>
+    );
+  };
+
+  const getVisibilityBadge = (event) => {
+    if (event.visible_public && event.accord_client_affichage) {
+      return (
+        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 flex items-center gap-1">
+          <Globe className="w-3 h-3" />
+          Public
+        </span>
+      );
+    }
+    return (
+      <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 flex items-center gap-1">
+        <Lock className="w-3 h-3" />
+        Privé
       </span>
     );
   };
@@ -232,6 +259,7 @@ const EvenementsAdmin = () => {
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Date</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Lieu</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Statut</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Visibilité</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Actions</th>
                 </tr>
               </thead>
@@ -246,6 +274,7 @@ const EvenementsAdmin = () => {
                     <td className="px-4 py-3 text-sm">{formatDate(event.date_debut)}</td>
                     <td className="px-4 py-3 text-sm">{event.lieu_evenement || '-'}</td>
                     <td className="px-4 py-3">{getStatutBadge(event.statut_evenement)}</td>
+                    <td className="px-4 py-3">{getVisibilityBadge(event)}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button
@@ -293,7 +322,10 @@ const EvenementsAdmin = () => {
             </div>
             <div className="p-6 space-y-4">
               <div className="flex items-center justify-between">
-                {getStatutBadge(selectedEvent.statut_evenement)}
+                <div className="flex items-center gap-2">
+                  {getStatutBadge(selectedEvent.statut_evenement)}
+                  {getVisibilityBadge(selectedEvent)}
+                </div>
                 <span className="text-sm text-gray-500">{selectedEvent.type_evenement}</span>
               </div>
 
@@ -319,6 +351,25 @@ const EvenementsAdmin = () => {
                   <p className="text-gray-600">{selectedEvent.theme_evenement}</p>
                 </div>
               )}
+
+              {/* Infos visibilité */}
+              <div className="p-3 bg-gray-50 rounded-btn">
+                <p className="text-sm font-semibold text-gray-700 mb-2">Visibilité :</p>
+                <div className="flex items-center gap-2 text-sm">
+                  {selectedEvent.accord_client_affichage ? (
+                    <span className="text-green-600">✓ Accord client obtenu</span>
+                  ) : (
+                    <span className="text-gray-500">✗ Accord client non obtenu</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-sm mt-1">
+                  {selectedEvent.visible_public ? (
+                    <span className="text-green-600">✓ Visible sur la page événements</span>
+                  ) : (
+                    <span className="text-gray-500">✗ Non visible publiquement</span>
+                  )}
+                </div>
+              </div>
 
               <div className="flex gap-3 pt-4 border-t">
                 <button
@@ -461,6 +512,60 @@ const EvenementsAdmin = () => {
                       <option key={s.value} value={s.value}>{s.label}</option>
                     ))}
                   </select>
+                </div>
+
+                {/* ✅ Section Visibilité publique */}
+                <div className="md:col-span-2 space-y-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-bleu-royal" />
+                    <p className="text-sm font-semibold text-bleu-royal">Visibilité sur la page Événements</p>
+                  </div>
+                  
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="w-5 h-5 rounded border-gray-300 text-bleu-royal focus:ring-bleu-royal"
+                      checked={formData.accord_client_affichage}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData({
+                          ...formData, 
+                          accord_client_affichage: checked,
+                          visible_public: checked ? formData.visible_public : false
+                        });
+                      }}
+                    />
+                    <span className="text-sm text-gray-700">
+                      Le client a donné son accord pour l'affichage public
+                    </span>
+                  </label>
+                  
+                  <label className={`flex items-center gap-3 ${!formData.accord_client_affichage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                    <input
+                      type="checkbox"
+                      className="w-5 h-5 rounded border-gray-300 text-bleu-royal focus:ring-bleu-royal"
+                      checked={formData.visible_public}
+                      onChange={(e) => setFormData({...formData, visible_public: e.target.checked})}
+                      disabled={!formData.accord_client_affichage}
+                    />
+                    <span className={`text-sm ${!formData.accord_client_affichage ? 'text-gray-400' : 'text-gray-700'}`}>
+                      Rendre visible sur la page Événements publique
+                    </span>
+                  </label>
+                  
+                  {!formData.accord_client_affichage && (
+                    <p className="text-xs text-blue-600 italic flex items-center gap-1">
+                      <Lock className="w-3 h-3" />
+                      L'accord du client est requis pour rendre l'événement visible publiquement
+                    </p>
+                  )}
+
+                  {formData.visible_public && formData.accord_client_affichage && (
+                    <p className="text-xs text-green-600 flex items-center gap-1">
+                      <Globe className="w-3 h-3" />
+                      Cet événement sera visible sur la page publique (si le statut n'est pas "Brouillon")
+                    </p>
+                  )}
                 </div>
               </div>
 

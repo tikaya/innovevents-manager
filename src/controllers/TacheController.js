@@ -35,14 +35,14 @@ const getEnRetard = asyncHandler(async (req, res) => {
 const create = asyncHandler(async (req, res) => {
     const tache = await TacheService.create(req.body);
     
-    // Log création tâche
     await LogService.log(
         ACTION_TYPES.CREATION_TACHE,
         req.user.id_utilisateur,
         { 
             id_tache: tache.id_tache,
             titre_tache: tache.titre_tache,
-            id_evenement: tache.id_evenement
+            id_evenement: tache.id_evenement,
+            id_assignee: tache.id_utilisateur
         },
         req.clientIp
     );
@@ -50,41 +50,38 @@ const create = asyncHandler(async (req, res) => {
     res.status(201).json({ success: true, data: tache });
 });
 
+// ✅ CORRECTION : Passer le rôle au service
 const update = asyncHandler(async (req, res) => {
-    // Récupérer l'ancien statut avant modification
-    const ancienneTache = await TacheService.getById(req.params.id);
-    const ancienStatut = ancienneTache.statut_tache;
+    const tache = await TacheService.update(req.params.id, req.body, req.user.role);
     
-    const tache = await TacheService.update(req.params.id, req.body);
-    
-    // Log si le statut a changé
-    if (req.body.statut_tache && req.body.statut_tache !== ancienStatut) {
-        await LogService.log(
-            ACTION_TYPES.MODIFICATION_STATUT_TACHE,
-            req.user.id_utilisateur,
-            { 
-                id_tache: parseInt(req.params.id),
-                titre_tache: tache.titre_tache,
-                ancien_statut: ancienStatut,
-                nouveau_statut: req.body.statut_tache
-            },
-            req.clientIp
-        );
-    }
+    await LogService.log(
+        ACTION_TYPES.MODIFICATION_TACHE,
+        req.user.id_utilisateur,
+        { 
+            id_tache: parseInt(req.params.id),
+            titre_tache: tache.titre_tache,
+            champs_modifies: Object.keys(req.body)
+        },
+        req.clientIp
+    );
     
     res.json({ success: true, data: tache });
 });
 
+// ✅ CORRECTION : Passer le rôle au service
 const updateStatut = asyncHandler(async (req, res) => {
     const { statut } = req.body;
     
-    // Récupérer l'ancien statut
     const ancienneTache = await TacheService.getById(req.params.id);
     const ancienStatut = ancienneTache.statut_tache;
     
-    const tache = await TacheService.updateStatut(req.params.id, statut, req.user.id_utilisateur);
+    const tache = await TacheService.updateStatut(
+        req.params.id, 
+        statut, 
+        req.user.id_utilisateur,
+        req.user.role
+    );
     
-    // Log modification statut tâche
     await LogService.log(
         ACTION_TYPES.MODIFICATION_STATUT_TACHE,
         req.user.id_utilisateur,
@@ -101,12 +98,10 @@ const updateStatut = asyncHandler(async (req, res) => {
 });
 
 const remove = asyncHandler(async (req, res) => {
-    // Récupérer la tâche AVANT suppression pour le log
     const tache = await TacheService.getById(req.params.id);
     
     await TacheService.delete(req.params.id);
     
-    // Log suppression tâche
     await LogService.log(
         ACTION_TYPES.SUPPRESSION_TACHE,
         req.user.id_utilisateur,
