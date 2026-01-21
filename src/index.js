@@ -92,7 +92,7 @@ if (process.env.NODE_ENV === 'development') {
 // ============================================
 
 // Uploads (images événements)
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // PDF des devis
 app.use('/devis', express.static(path.join(__dirname, '../devis')));

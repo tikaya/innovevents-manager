@@ -8,6 +8,7 @@ const router = express.Router();
 const EvenementController = require('../controllers/EvenementController');
 const { authenticate, authorize } = require('../middlewares/auth');
 const { validateEvenement, validateId } = require('../middlewares/validation');
+const { uploadEvenement } = require('../middlewares/upload');
 
 // Public
 router.get('/public', EvenementController.getPublic);
@@ -25,5 +26,9 @@ router.post('/', authenticate, authorize('admin'), validateEvenement, EvenementC
 router.put('/:id', authenticate, authorize('admin'), validateId, EvenementController.update);
 router.patch('/:id/statut', authenticate, authorize('admin'), validateId, EvenementController.updateStatut);
 router.delete('/:id', authenticate, authorize('admin'), validateId, EvenementController.remove);
+
+// ✅ Routes upload image (admin uniquement)
+router.post('/:id/image', authenticate, authorize('admin'), uploadEvenement.single('image'), EvenementController.uploadImage);
+router.delete('/:id/image', authenticate, authorize('admin'), EvenementController.deleteImage);
 
 module.exports = router;

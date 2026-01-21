@@ -4,14 +4,15 @@ import {
   Search, 
   Plus, 
   Eye, 
-  EyeOff,
   Edit,
   Trash2,
   Calendar,
   MapPin,
   X,
   Globe,
-  Lock
+  Lock,
+  Image,
+  Upload
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -25,6 +26,7 @@ const EvenementsAdmin = () => {
   const [showFormModal, setShowFormModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     nom_evenement: '',
@@ -38,7 +40,10 @@ const EvenementsAdmin = () => {
     statut_evenement: 'brouillon',
     id_client: '',
     visible_public: false,
-    accord_client_affichage: false
+    accord_client_affichage: false,
+    image_evenement: null,
+    imageFile: null,
+    imagePreview: null
   });
 
   const statuts = [
@@ -51,6 +56,16 @@ const EvenementsAdmin = () => {
   ];
 
   const types = ['Seminaire', 'Conference', 'Soiree', 'Team building', 'Lancement', 'Gala', 'Autre'];
+
+  // URL de base pour les images
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    // Si c'est déjà une URL complète ou un blob
+    if (imagePath.startsWith('http') || imagePath.startsWith('blob:')) return imagePath;
+    // Sinon, construire l'URL avec le backend
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    return `${baseUrl}${imagePath}`;
+  };
 
   useEffect(() => {
     fetchEvenements();
@@ -91,7 +106,10 @@ const EvenementsAdmin = () => {
       statut_evenement: 'brouillon',
       id_client: '',
       visible_public: false,
-      accord_client_affichage: false
+      accord_client_affichage: false,
+      image_evenement: null,
+      imageFile: null,
+      imagePreview: null
     });
     setShowFormModal(true);
   };
@@ -110,7 +128,10 @@ const EvenementsAdmin = () => {
       statut_evenement: event.statut_evenement || 'brouillon',
       id_client: event.id_client || '',
       visible_public: event.visible_public || false,
-      accord_client_affichage: event.accord_client_affichage || false
+      accord_client_affichage: event.accord_client_affichage || false,
+      image_evenement: event.image_evenement || null,
+      imageFile: null,
+      imagePreview: null
     });
     setShowFormModal(true);
   };
@@ -127,24 +148,122 @@ const EvenementsAdmin = () => {
     }
   };
 
+  // Gestion de l'upload d'image
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Vérifier le type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Type de fichier non autorisé. Utilisez JPG, PNG, GIF ou WebP.');
+      return;
+    }
+
+    // Vérifier la taille (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image trop volumineuse (max 5 MB)');
+      return;
+    }
+
+    // Créer un aperçu
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({
+        ...prev,
+        imageFile: file,
+        imagePreview: reader.result
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Upload d'image pour un événement existant
+  const uploadImage = async (evenementId, file) => {
+    const formDataUpload = new FormData();
+    formDataUpload.append('image', file);
+
+    try {
+      const response = await api.post(
+        `/evenements/${evenementId}/image`,
+        formDataUpload,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+      return response.data.image_url;
+    } catch (err) {
+      console.error('Erreur upload image:', err);
+      throw err;
+    }
+  };
+
+  // Supprimer l'image
+  const handleDeleteImage = async () => {
+    if (selectedEvent && selectedEvent.image_evenement) {
+      if (!confirm('Supprimer cette image ?')) return;
+      
+      try {
+        setUploading(true);
+        await api.delete(`/evenements/${selectedEvent.id_evenement}/image`);
+        toast.success('Image supprimée');
+        setSelectedEvent(prev => ({ ...prev, image_evenement: null }));
+        setFormData(prev => ({ ...prev, image_evenement: null, imageFile: null, imagePreview: null }));
+        fetchEvenements();
+      } catch (err) {
+        toast.error('Erreur lors de la suppression de l\'image');
+      } finally {
+        setUploading(false);
+      }
+    } else {
+      // Juste annuler la sélection locale
+      setFormData(prev => ({ ...prev, imageFile: null, imagePreview: null }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
 
     try {
       const payload = {
-        ...formData,
+        nom_evenement: formData.nom_evenement,
+        date_debut: formData.date_debut,
+        heure_debut: formData.heure_debut,
+        date_fin: formData.date_fin,
+        heure_fin: formData.heure_fin,
+        lieu_evenement: formData.lieu_evenement,
+        type_evenement: formData.type_evenement,
+        theme_evenement: formData.theme_evenement,
+        statut_evenement: formData.statut_evenement,
         id_client: formData.id_client ? parseInt(formData.id_client) : null,
-        visible_public: formData.accord_client_affichage ? formData.visible_public : false
+        visible_public: formData.accord_client_affichage ? formData.visible_public : false,
+        accord_client_affichage: formData.accord_client_affichage
       };
+
+      let evenementId;
 
       if (selectedEvent) {
         await api.put(`/evenements/${selectedEvent.id_evenement}`, payload);
+        evenementId = selectedEvent.id_evenement;
         toast.success('Événement modifié avec succès');
       } else {
-        await api.post('/evenements', payload);
+        const response = await api.post('/evenements', payload);
+        evenementId = response.data.data.id_evenement;
         toast.success('Événement créé avec succès');
       }
+
+      // Upload image si nouveau fichier sélectionné
+      if (formData.imageFile && evenementId) {
+        try {
+          setUploading(true);
+          await uploadImage(evenementId, formData.imageFile);
+          toast.success('Image uploadée avec succès');
+        } catch (err) {
+          toast.error('Erreur lors de l\'upload de l\'image');
+        } finally {
+          setUploading(false);
+        }
+      }
+
       setShowFormModal(false);
       fetchEvenements();
     } catch (err) {
@@ -254,6 +373,7 @@ const EvenementsAdmin = () => {
             <table className="w-full">
               <thead className="bg-bleu-ciel">
                 <tr>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Image</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Événement</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Client</th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-bleu-royal">Date</th>
@@ -266,6 +386,19 @@ const EvenementsAdmin = () => {
               <tbody className="divide-y divide-gray-100">
                 {filteredEvents.map((event) => (
                   <tr key={event.id_evenement} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      {event.image_evenement ? (
+                        <img 
+                          src={getImageUrl(event.image_evenement)} 
+                          alt={event.nom_evenement}
+                          className="w-16 h-12 object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="w-16 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <Image className="w-5 h-5 text-gray-400" />
+                        </div>
+                      )}
+                    </td>
                     <td className="px-4 py-3">
                       <p className="font-semibold text-gris-ardoise">{event.nom_evenement}</p>
                       <p className="text-sm text-gray-500">{event.type_evenement}</p>
@@ -311,7 +444,7 @@ const EvenementsAdmin = () => {
       {/* Modal Détails */}
       {showModal && selectedEvent && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-card max-w-lg w-full">
+          <div className="bg-white rounded-card max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b flex items-center justify-between">
               <h2 className="text-xl font-montserrat font-bold text-gris-ardoise">
                 {selectedEvent.nom_evenement}
@@ -321,6 +454,17 @@ const EvenementsAdmin = () => {
               </button>
             </div>
             <div className="p-6 space-y-4">
+              {/* Image de l'événement */}
+              {selectedEvent.image_evenement && (
+                <div className="mb-4">
+                  <img 
+                    src={getImageUrl(selectedEvent.image_evenement)} 
+                    alt={selectedEvent.nom_evenement}
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {getStatutBadge(selectedEvent.statut_evenement)}
@@ -514,7 +658,66 @@ const EvenementsAdmin = () => {
                   </select>
                 </div>
 
-                {/* ✅ Section Visibilité publique */}
+                {/* Section Image de l'événement */}
+                <div className="md:col-span-2 space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center gap-2">
+                    <Image className="w-5 h-5 text-gris-ardoise" />
+                    <p className="text-sm font-semibold text-gris-ardoise">Image de l'événement</p>
+                  </div>
+
+                  {/* Aperçu image existante ou nouvelle */}
+                  {(formData.imagePreview || formData.image_evenement) && (
+                    <div className="relative inline-block">
+                      <img 
+                        src={formData.imagePreview || getImageUrl(formData.image_evenement)}
+                        alt="Aperçu"
+                        className="w-48 h-32 object-cover rounded-lg border shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleDeleteImage}
+                        disabled={uploading}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 shadow-md transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Input upload */}
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-btn cursor-pointer hover:bg-gray-50 transition-colors">
+                      <Upload className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm text-gray-700">
+                        {formData.imagePreview || formData.image_evenement ? 'Changer l\'image' : 'Ajouter une image'}
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                        className="hidden"
+                        onChange={handleImageChange}
+                        disabled={uploading}
+                      />
+                    </label>
+                    {uploading && (
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <div className="animate-spin w-4 h-4 border-2 border-bleu-royal border-t-transparent rounded-full"></div>
+                        Upload en cours...
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-gray-500">
+                    Formats acceptés : JPG, PNG, GIF, WebP. Taille max : 5 MB.
+                    {!selectedEvent && formData.imageFile && (
+                      <span className="block text-blue-600 mt-1">
+                        ℹ️ L'image sera uploadée après la création de l'événement.
+                      </span>
+                    )}
+                  </p>
+                </div>
+
+                {/* Section Visibilité publique */}
                 <div className="md:col-span-2 space-y-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="flex items-center gap-2">
                     <Globe className="w-5 h-5 text-bleu-royal" />
@@ -573,7 +776,11 @@ const EvenementsAdmin = () => {
                 <button type="button" onClick={() => setShowFormModal(false)} className="btn-secondary flex-1">
                   Annuler
                 </button>
-                <button type="submit" disabled={saving} className={`btn-primary flex-1 ${saving ? 'opacity-50' : ''}`}>
+                <button 
+                  type="submit" 
+                  disabled={saving || uploading} 
+                  className={`btn-primary flex-1 ${(saving || uploading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
                   {saving ? 'Enregistrement...' : selectedEvent ? 'Modifier' : 'Créer'}
                 </button>
               </div>
