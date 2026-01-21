@@ -204,6 +204,10 @@ class EmailService {
         `;
     }
 
+    // ============================================
+    // EMAILS UTILISATEURS
+    // ============================================
+
     static async sendWelcome(user) {
         const content = `
             <h1 style="color: ${this.colors.bleuRoyal}; margin: 0 0 24px 0; font-size: 28px;">Bienvenue chez Innov'Events ! 🎉</h1>
@@ -295,6 +299,10 @@ class EmailService {
             html
         });
     }
+
+    // ============================================
+    // EMAILS PROSPECTS
+    // ============================================
 
     static async sendNewProspect(prospect) {
         const content = `
@@ -397,6 +405,110 @@ class EmailService {
         });
     }
 
+    // ============================================
+    // ✅ NOUVEAU : EMAILS CLIENTS EXISTANTS
+    // ============================================
+
+    /**
+     * Email envoyé quand un client existant fait une nouvelle demande
+     * et qu'un événement est créé pour lui
+     */
+    static async sendNewEventForExistingClient(client, evenement) {
+        const content = `
+            <h1 style="color: ${this.colors.bleuRoyal}; margin: 0 0 24px 0; font-size: 28px;">Nouveau projet en cours ! 🎉</h1>
+            <p style="color: ${this.colors.grisArdoise}; font-size: 16px; line-height: 1.6; margin: 0 0 16px 0;">
+                Bonjour <strong>${client.prenom_contact}</strong>,
+            </p>
+            <p style="color: ${this.colors.gris}; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
+                Suite à votre nouvelle demande, nous avons le plaisir de vous informer qu'un nouveau projet a été créé dans votre espace client !
+            </p>
+            <div style="background: linear-gradient(135deg, ${this.colors.bleuRoyal} 0%, #2563EB 100%); border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
+                <p style="color: ${this.colors.bleuCiel}; margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase;">Nouvel événement</p>
+                <p style="color: ${this.colors.blanc}; margin: 0 0 8px 0; font-size: 22px; font-weight: bold;">${evenement.nom_evenement}</p>
+                <p style="color: ${this.colors.or}; margin: 0; font-size: 16px;">
+                    📅 ${evenement.date_debut ? new Date(evenement.date_debut).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Date à définir'}
+                </p>
+            </div>
+            <div style="background-color: ${this.colors.blancCasse}; border-radius: 12px; padding: 24px; margin: 24px 0;">
+                <h3 style="color: ${this.colors.bleuRoyal}; margin: 0 0 16px 0; font-size: 16px;">📋 Détails de l'événement</h3>
+                ${this.getStyledTable([
+                    { label: 'Type', value: evenement.type_evenement || 'À définir' },
+                    { label: 'Lieu', value: evenement.lieu_evenement || 'À définir' },
+                    { label: 'Statut', value: '<span style="color: #059669;">✓ En préparation</span>' }
+                ])}
+            </div>
+            ${this.getInfoBox('Notre équipe va préparer votre devis personnalisé. Vous serez notifié dès qu\'il sera disponible dans votre espace client.', 'info')}
+            <p style="color: ${this.colors.grisArdoise}; font-size: 15px; margin: 24px 0 0 0;">
+                Merci pour votre confiance renouvelée !<br><strong style="color: ${this.colors.bleuRoyal};">L'équipe Innov'Events</strong>
+            </p>
+        `;
+        const html = this.getBaseTemplate(content, {
+            showButton: true,
+            buttonText: 'Voir mes événements',
+            buttonUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/client/evenements`,
+            preheader: `Nouveau projet créé : ${evenement.nom_evenement}`
+        });
+        await this.send({
+            to: client.email_client,
+            subject: `🎉 Innov'Events - Nouveau projet : ${evenement.nom_evenement}`,
+            text: `Un nouveau projet "${evenement.nom_evenement}" a été créé dans votre espace client.`,
+            html
+        });
+    }
+
+    /**
+     * Email envoyé quand un utilisateur existant (sans profil client)
+     * est converti en client suite à une demande de devis
+     */
+    static async sendClientProfileCreated(client) {
+        const content = `
+            <h1 style="color: ${this.colors.bleuRoyal}; margin: 0 0 24px 0; font-size: 28px;">Votre profil client est activé ! 🎊</h1>
+            <p style="color: ${this.colors.grisArdoise}; font-size: 16px; line-height: 1.6; margin: 0 0 16px 0;">
+                Bonjour <strong>${client.prenom_contact}</strong>,
+            </p>
+            <p style="color: ${this.colors.gris}; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
+                Suite à votre demande de devis, nous avons activé votre profil client ! Vous pouvez maintenant accéder à toutes les fonctionnalités de votre espace personnel.
+            </p>
+            <div style="background-color: ${this.colors.blancCasse}; border-radius: 12px; padding: 24px; margin: 24px 0;">
+                <h3 style="color: ${this.colors.bleuRoyal}; margin: 0 0 16px 0; font-size: 16px;">🏢 Votre profil entreprise</h3>
+                ${this.getStyledTable([
+                    { label: 'Entreprise', value: client.nom_entreprise_client },
+                    { label: 'Contact', value: `${client.prenom_contact} ${client.nom_contact}` },
+                    { label: 'Email', value: client.email_client }
+                ])}
+            </div>
+            <div style="background-color: ${this.colors.bleuCiel}; border-radius: 12px; padding: 24px; margin: 24px 0;">
+                <h3 style="color: ${this.colors.bleuRoyal}; margin: 0 0 16px 0; font-size: 16px;">✨ Ce que vous pouvez faire maintenant</h3>
+                <ul style="color: ${this.colors.grisArdoise}; margin: 0; padding-left: 20px; line-height: 1.8;">
+                    <li>Consulter et accepter vos devis</li>
+                    <li>Suivre l'avancement de vos événements</li>
+                    <li>Télécharger vos documents (devis, factures)</li>
+                    <li>Communiquer avec notre équipe</li>
+                </ul>
+            </div>
+            ${this.getInfoBox('Connectez-vous avec vos identifiants habituels pour accéder à votre espace.', 'info')}
+            <p style="color: ${this.colors.grisArdoise}; font-size: 15px; margin: 24px 0 0 0;">
+                Bienvenue parmi nos clients !<br><strong style="color: ${this.colors.bleuRoyal};">L'équipe Innov'Events</strong>
+            </p>
+        `;
+        const html = this.getBaseTemplate(content, {
+            showButton: true,
+            buttonText: 'Accéder à mon espace client',
+            buttonUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/client/dashboard`,
+            preheader: "Votre profil client Innov'Events est maintenant actif !"
+        });
+        await this.send({
+            to: client.email_client,
+            subject: "🎊 Innov'Events - Votre profil client est activé !",
+            text: `Votre profil client pour ${client.nom_entreprise_client} est maintenant actif.`,
+            html
+        });
+    }
+
+    // ============================================
+    // EMAILS DEVIS
+    // ============================================
+
     static async sendDevis(devis, pdfBuffer) {
         const content = `
             <h1 style="color: ${this.colors.bleuRoyal}; margin: 0 0 24px 0; font-size: 28px;">Votre devis est prêt ! 📄</h1>
@@ -467,6 +579,10 @@ class EmailService {
         });
     }
 
+    // ============================================
+    // EMAILS CONTACT
+    // ============================================
+
     static async sendContact(contact) {
         const content = `
             <h1 style="color: ${this.colors.bleuRoyal}; margin: 0 0 24px 0; font-size: 28px;">Nouveau message de contact 📬</h1>
@@ -496,6 +612,10 @@ class EmailService {
             html
         });
     }
+
+    // ============================================
+    // EMAILS EMPLOYÉS
+    // ============================================
 
     static async sendEmployeeAccountCreated(user, tempPassword) {
         const content = `
