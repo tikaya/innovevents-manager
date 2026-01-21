@@ -27,8 +27,9 @@ const PORT = process.env.PORT || 3000;
 // ============================================
 
 // Helmet - Sécurité HTTP headers
-app.use(helmet());
-
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 // CORS - Autoriser local ET production
 const allowedOrigins = [
     'http://localhost:5173',
