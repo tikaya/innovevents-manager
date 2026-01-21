@@ -59,6 +59,23 @@ const getProchains = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Récupère les types d'événements
+ */
+const getTypes = asyncHandler(async (req, res) => {
+    const types = ['Seminaire', 'Conference', 'Soiree', 'Team building', 'Lancement', 'Gala', 'Autre'];
+    res.json({ success: true, data: types });
+});
+
+/**
+ * Récupère les thèmes d'événements
+ */
+const getThemes = asyncHandler(async (req, res) => {
+    // Récupérer les thèmes uniques depuis la BDD ou liste statique
+    const themes = ['Innovation', 'Digital', 'Leadership', 'RSE', 'Bien-être', 'Networking', 'Autre'];
+    res.json({ success: true, data: themes });
+});
+
+/**
  * Crée un nouvel événement
  */
 const create = asyncHandler(async (req, res) => {
@@ -103,6 +120,34 @@ const update = asyncHandler(async (req, res) => {
             req.clientIp
         );
     }
+    
+    res.json({ success: true, data: evenement });
+});
+
+/**
+ * Met à jour le statut d'un événement
+ */
+const updateStatut = asyncHandler(async (req, res) => {
+    const { statut } = req.body;
+    
+    // Récupérer l'ancien statut
+    const ancienEvenement = await EvenementService.getById(req.params.id);
+    const ancienStatut = ancienEvenement.statut_evenement;
+    
+    const evenement = await EvenementService.updateStatut(req.params.id, statut);
+    
+    // Log modification statut
+    await LogService.log(
+        ACTION_TYPES.MODIFICATION_STATUT_EVENEMENT,
+        req.user.id_utilisateur,
+        { 
+            id_evenement: parseInt(req.params.id),
+            nom_evenement: evenement.nom_evenement,
+            ancien_statut: ancienStatut,
+            nouveau_statut: statut
+        },
+        req.clientIp
+    );
     
     res.json({ success: true, data: evenement });
 });
@@ -240,8 +285,11 @@ module.exports = {
     getByClient,
     getMine,
     getProchains,
+    getTypes,       // ✅ AJOUT
+    getThemes,      // ✅ AJOUT
     create, 
-    update, 
+    update,
+    updateStatut,   // ✅ AJOUT
     remove,
     getStats,
     uploadImage,
