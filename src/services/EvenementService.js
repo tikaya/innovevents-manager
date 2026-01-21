@@ -54,7 +54,7 @@ class EvenementService {
     }
 
     static async updateStatut(id, statut) {
-        const valid = ['brouillon', 'accepte', 'en_cours', 'termine', 'annuler'];
+        const valid = ['brouillon', 'en_attente', 'accepte', 'en_cours', 'termine', 'annule'];
         if (!valid.includes(statut)) throw new Error('Statut invalide');
         
         const evenement = await Evenement.updateStatut(id, statut);

@@ -29,6 +29,19 @@ const getEnAttente = asyncHandler(async (req, res) => {
 
 const create = asyncHandler(async (req, res) => {
     const avis = await AvisService.create(req.body, req.user.id_utilisateur);
+    
+    // ✅ AJOUT : Log création avis
+    await LogService.log(
+        ACTION_TYPES.CREATION_AVIS,
+        req.user.id_utilisateur,
+        { 
+            id_avis: avis.id_avis,
+            id_evenement: avis.id_evenement,
+            note: avis.note_avis
+        },
+        req.clientIp
+    );
+    
     res.status(201).json({ success: true, data: avis });
 });
 
@@ -69,7 +82,23 @@ const reject = asyncHandler(async (req, res) => {
 });
 
 const remove = asyncHandler(async (req, res) => {
+    // ✅ AJOUT : Récupérer l'avis AVANT suppression pour le log
+    const avis = await AvisService.getById(req.params.id);
+    
     await AvisService.delete(req.params.id);
+    
+    // ✅ AJOUT : Log suppression avis
+    await LogService.log(
+        ACTION_TYPES.SUPPRESSION_AVIS,
+        req.user.id_utilisateur,
+        { 
+            id_avis: parseInt(req.params.id),
+            id_evenement: avis.id_evenement,
+            note: avis.note_avis
+        },
+        req.clientIp
+    );
+    
     res.json({ success: true, message: 'Avis supprimé' });
 });
 

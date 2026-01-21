@@ -139,8 +139,8 @@ const remove = asyncHandler(async (req, res) => {
     // Vérifier s'il y a des événements en cours
     const evenements = await ClientService.getEvenements(req.params.id);
     const evenementsActifs = evenements?.filter(e => 
-        ['confirme', 'planifie', 'en_cours'].includes(e.statut_evenement)
-    );
+    ['en_attente', 'accepte', 'en_cours'].includes(e.statut_evenement)
+);
     
     if (evenementsActifs && evenementsActifs.length > 0) {
         return res.status(400).json({ 
@@ -175,8 +175,8 @@ const deleteMe = asyncHandler(async (req, res) => {
     // Vérifier s'il y a des événements en cours
     const evenements = await ClientService.getEvenements(client.id_client);
     const evenementsActifs = evenements?.filter(e => 
-        ['confirme', 'planifie', 'en_cours'].includes(e.statut_evenement)
-    );
+    ['en_attente', 'accepte', 'en_cours'].includes(e.statut_evenement)
+);
     
     if (evenementsActifs && evenementsActifs.length > 0) {
         return res.status(400).json({ 

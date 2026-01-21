@@ -226,8 +226,9 @@ class ClientService {
         const evenements = await Client.getEvenements(id);
         if (evenements && evenements.length > 0) {
             const evenementsActifs = evenements.filter(e => 
-                ['confirme', 'planifie', 'en_cours'].includes(e.statut_evenement)
-            );
+    ['en_attente', 'accepte', 'en_cours'].includes(e.statut_evenement)
+);
+
             if (evenementsActifs.length > 0) {
                 throw new Error(`Impossible de supprimer ce client : ${evenementsActifs.length} événement(s) en cours`);
             }

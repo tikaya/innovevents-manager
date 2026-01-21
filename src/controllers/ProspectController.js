@@ -27,8 +27,8 @@ const create = asyncHandler(async (req, res) => {
         { 
             id_prospect: prospect.id_prospect,
             nom_entreprise: prospect.nom_entreprise,
-            email: prospect.email_contact,
-            type_evenement: prospect.type_evenement
+            email: prospect.email_prospect,
+            type_evenement: prospect.type_evenement_souhaite
         },
         req.clientIp
     );
@@ -82,16 +82,19 @@ const convert = asyncHandler(async (req, res) => {
 });
 
 const remove = asyncHandler(async (req, res) => {
+    // Récupérer le prospect AVANT suppression pour le log
     const prospect = await ProspectService.getById(req.params.id);
+    
     await ProspectService.delete(req.params.id);
     
-    // ✅ AJOUT Log suppression
+    // Log suppression prospect
     await LogService.log(
         ACTION_TYPES.SUPPRESSION_PROSPECT,
         req.user.id_utilisateur,
         { 
             id_prospect: parseInt(req.params.id),
-            nom_entreprise: prospect.nom_entreprise
+            nom_entreprise: prospect.nom_entreprise,
+            email: prospect.email_prospect
         },
         req.clientIp
     );

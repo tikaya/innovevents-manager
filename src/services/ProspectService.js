@@ -317,7 +317,7 @@ class ProspectService {
      * Compte les prospects en attente
      */
     static async countEnAttente() {
-        return Prospect.countByStatut('nouveau');
+        return Prospect.countByStatut('a_contacter');
     }
 
     /**

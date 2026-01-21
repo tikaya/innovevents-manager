@@ -150,6 +150,28 @@ class Prospect {
         const result = await query(sql, [`%${searchTerm}%`]);
         return result.rows;
     }
+    
+  /**
+     * Compte les prospects par statut
+     */
+    static async countByStatut(statut) {
+        const sql = 'SELECT COUNT(*) as count FROM prospect WHERE statut_prospect = $1';
+        const result = await query(sql, [statut]);
+        return parseInt(result.rows[0].count) || 0;
+    }
+
+    /**
+     * Récupère les prospects récents
+     */
+    static async findRecent(limit = 5) {
+        const sql = `
+            SELECT * FROM prospect 
+            ORDER BY date_creation_prospect DESC 
+            LIMIT $1
+        `;
+        const result = await query(sql, [limit]);
+        return result.rows;
+    }
 }
 
 module.exports = Prospect;
