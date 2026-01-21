@@ -20,6 +20,14 @@ const Evenements = () => {
   const [types, setTypes] = useState([]);
   const [themes, setThemes] = useState([]);
 
+  // URL de base pour les images
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('http') || imagePath.startsWith('blob:')) return imagePath;
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    return `${baseUrl}${imagePath}`;
+  };
+
   useEffect(() => {
     fetchEvenements();
     fetchTypes();
@@ -204,11 +212,19 @@ const Evenements = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredEvenements.map((event) => (
               <div key={event.id_evenement} className="bg-white rounded-card shadow-card overflow-hidden hover:shadow-xl transition-shadow group">
-                {/* Image */}
-                <div className="h-48 bg-gradient-to-br from-bleu-ciel to-blue-200 relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Calendar className="w-12 h-12 text-bleu-royal/30" />
-                  </div>
+                {/* ✅ Image corrigée */}
+                <div className="h-48 bg-gradient-to-br from-bleu-ciel to-blue-200 relative overflow-hidden">
+                  {event.image_evenement ? (
+                    <img 
+                      src={getImageUrl(event.image_evenement)}
+                      alt={event.nom_evenement}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Calendar className="w-12 h-12 text-bleu-royal/30" />
+                    </div>
+                  )}
                   <div className="absolute top-4 left-4">
                     <span className="bg-or text-bleu-royal text-xs font-semibold px-3 py-1 rounded-full">
                       {event.type_evenement}
@@ -229,7 +245,7 @@ const Evenements = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-or" />
-                      {event.lieu_evenement}
+                      {event.lieu_evenement || 'Lieu à définir'}
                     </div>
                     {event.theme_evenement && (
                       <div className="flex items-center gap-2">
