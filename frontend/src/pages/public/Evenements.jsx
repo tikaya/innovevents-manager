@@ -20,14 +20,6 @@ const Evenements = () => {
   const [types, setTypes] = useState([]);
   const [themes, setThemes] = useState([]);
 
-  // URL de base pour les images
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return null;
-    if (imagePath.startsWith('http') || imagePath.startsWith('blob:')) return imagePath;
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    return `${baseUrl}${imagePath}`;
-  };
-
   useEffect(() => {
     fetchEvenements();
     fetchTypes();
@@ -212,11 +204,11 @@ const Evenements = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredEvenements.map((event) => (
               <div key={event.id_evenement} className="bg-white rounded-card shadow-card overflow-hidden hover:shadow-xl transition-shadow group">
-                {/* ✅ Image corrigée */}
+                {/* Image - Cloudinary URL directe */}
                 <div className="h-48 bg-gradient-to-br from-bleu-ciel to-blue-200 relative overflow-hidden">
                   {event.image_evenement ? (
                     <img 
-                      src={getImageUrl(event.image_evenement)}
+                      src={event.image_evenement}
                       alt={event.nom_evenement}
                       className="w-full h-full object-cover"
                     />

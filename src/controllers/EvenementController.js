@@ -6,8 +6,7 @@
 const EvenementService = require('../services/EvenementService');
 const { LogService, ACTION_TYPES } = require('../services/LogService');
 const { asyncHandler } = require('../middlewares/errorHandler');
-const path = require('path');
-const fs = require('fs');
+const { uploadToCloudinary, deleteFromCloudinary } = require('../middlewares/upload');
 
 /**
  * Récupère tous les événements
@@ -70,7 +69,6 @@ const getTypes = asyncHandler(async (req, res) => {
  * Récupère les thèmes d'événements
  */
 const getThemes = asyncHandler(async (req, res) => {
-    // Récupérer les thèmes uniques depuis la BDD ou liste statique
     const themes = ['Innovation', 'Digital', 'Leadership', 'RSE', 'Bien-être', 'Networking', 'Autre'];
     res.json({ success: true, data: themes });
 });
@@ -159,12 +157,9 @@ const remove = asyncHandler(async (req, res) => {
     // Récupérer l'événement AVANT suppression pour le log
     const evenement = await EvenementService.getById(req.params.id);
     
-    // Supprimer l'image si elle existe
+    // Supprimer l'image de Cloudinary si elle existe
     if (evenement.image_evenement) {
-        const imagePath = path.join(__dirname, '../../public', evenement.image_evenement);
-        if (fs.existsSync(imagePath)) {
-            fs.unlinkSync(imagePath);
-        }
+        await deleteFromCloudinary(evenement.image_evenement);
     }
     
     await EvenementService.delete(req.params.id);
@@ -193,7 +188,7 @@ const getStats = asyncHandler(async (req, res) => {
 });
 
 /**
- * Upload d'image pour un événement
+ * Upload d'image pour un événement (vers Cloudinary)
  */
 const uploadImage = asyncHandler(async (req, res) => {
     if (!req.file) {
@@ -206,23 +201,17 @@ const uploadImage = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const evenement = await EvenementService.getById(id);
     
-    // Supprimer l'ancienne image si elle existe
+    // Supprimer l'ancienne image de Cloudinary si elle existe
     if (evenement.image_evenement) {
-        const oldImagePath = path.join(__dirname, '../../public', evenement.image_evenement);
-        if (fs.existsSync(oldImagePath)) {
-            try {
-                fs.unlinkSync(oldImagePath);
-            } catch (err) {
-                console.error('Erreur suppression ancienne image:', err);
-            }
-        }
+        await deleteFromCloudinary(evenement.image_evenement);
     }
 
-    // Chemin relatif pour la BDD
-    const imagePath = `/uploads/evenements/${req.file.filename}`;
+    // Upload vers Cloudinary
+    const result = await uploadToCloudinary(req.file.buffer, 'evenements');
+    const imageUrl = result.secure_url; // URL HTTPS complète
     
-    // Mettre à jour l'événement
-    const updated = await EvenementService.update(id, { image_evenement: imagePath });
+    // Mettre à jour l'événement avec l'URL Cloudinary
+    const updated = await EvenementService.update(id, { image_evenement: imageUrl });
 
     // Log upload image
     await LogService.log(
@@ -231,7 +220,7 @@ const uploadImage = asyncHandler(async (req, res) => {
         { 
             id_evenement: parseInt(id),
             nom_evenement: updated.nom_evenement,
-            image_path: imagePath
+            image_url: imageUrl
         },
         req.clientIp
     );
@@ -239,7 +228,7 @@ const uploadImage = asyncHandler(async (req, res) => {
     res.json({ 
         success: true, 
         data: updated,
-        image_url: imagePath,
+        image_url: imageUrl,
         message: 'Image uploadée avec succès' 
     });
 });
@@ -251,17 +240,12 @@ const deleteImage = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const evenement = await EvenementService.getById(id);
     
+    // Supprimer de Cloudinary
     if (evenement.image_evenement) {
-        const imagePath = path.join(__dirname, '../../public', evenement.image_evenement);
-        if (fs.existsSync(imagePath)) {
-            try {
-                fs.unlinkSync(imagePath);
-            } catch (err) {
-                console.error('Erreur suppression image:', err);
-            }
-        }
+        await deleteFromCloudinary(evenement.image_evenement);
     }
 
+    // Mettre à null en BDD
     await EvenementService.update(id, { image_evenement: null });
 
     // Log suppression image
@@ -285,11 +269,11 @@ module.exports = {
     getByClient,
     getMine,
     getProchains,
-    getTypes,       // ✅ AJOUT
-    getThemes,      // ✅ AJOUT
+    getTypes,
+    getThemes,
     create, 
     update,
-    updateStatut,   // ✅ AJOUT
+    updateStatut,
     remove,
     getStats,
     uploadImage,

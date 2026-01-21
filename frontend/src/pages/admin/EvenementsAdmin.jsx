@@ -57,16 +57,6 @@ const EvenementsAdmin = () => {
 
   const types = ['Seminaire', 'Conference', 'Soiree', 'Team building', 'Lancement', 'Gala', 'Autre'];
 
-  // URL de base pour les images
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return null;
-    // Si c'est déjà une URL complète ou un blob
-    if (imagePath.startsWith('http') || imagePath.startsWith('blob:')) return imagePath;
-    // Sinon, construire l'URL avec le backend
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    return `${baseUrl}${imagePath}`;
-  };
-
   useEffect(() => {
     fetchEvenements();
     fetchClients();
@@ -389,7 +379,7 @@ const EvenementsAdmin = () => {
                     <td className="px-4 py-3">
                       {event.image_evenement ? (
                         <img 
-                          src={getImageUrl(event.image_evenement)} 
+                          src={event.image_evenement} 
                           alt={event.nom_evenement}
                           className="w-16 h-12 object-cover rounded-lg"
                         />
@@ -454,11 +444,11 @@ const EvenementsAdmin = () => {
               </button>
             </div>
             <div className="p-6 space-y-4">
-              {/* Image de l'événement */}
+              {/* Image de l'événement - URL Cloudinary directe */}
               {selectedEvent.image_evenement && (
                 <div className="mb-4">
                   <img 
-                    src={getImageUrl(selectedEvent.image_evenement)} 
+                    src={selectedEvent.image_evenement} 
                     alt={selectedEvent.nom_evenement}
                     className="w-full h-48 object-cover rounded-lg"
                   />
@@ -669,7 +659,7 @@ const EvenementsAdmin = () => {
                   {(formData.imagePreview || formData.image_evenement) && (
                     <div className="relative inline-block">
                       <img 
-                        src={formData.imagePreview || getImageUrl(formData.image_evenement)}
+                        src={formData.imagePreview || formData.image_evenement}
                         alt="Aperçu"
                         className="w-48 h-32 object-cover rounded-lg border shadow-sm"
                       />

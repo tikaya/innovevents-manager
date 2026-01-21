@@ -1,34 +1,14 @@
 /**
- * Middleware Upload - Multer
+ * Middleware Upload - Multer + Cloudinary
  * @module middlewares/upload
  */
 
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require('../config/cloudinary');
+const { Readable } = require('stream');
 
-// Créer le dossier uploads s'il n'existe pas
-const uploadDir = path.join(__dirname, '../../public/uploads/evenements');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Configuration du stockage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        // Nom unique : timestamp + nom original nettoyé
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        const name = path.basename(file.originalname, ext)
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, '-')
-            .substring(0, 30);
-        cb(null, `${name}-${uniqueSuffix}${ext}`);
-    }
-});
+// Stockage en mémoire (pas sur disque car Render efface les fichiers)
+const storage = multer.memoryStorage();
 
 // Filtre : uniquement les images
 const fileFilter = (req, file, cb) => {
@@ -40,7 +20,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Export du middleware
+// Middleware Multer
 const uploadEvenement = multer({
     storage: storage,
     fileFilter: fileFilter,
@@ -49,4 +29,61 @@ const uploadEvenement = multer({
     }
 });
 
-module.exports = { uploadEvenement };
+/**
+ * Upload un buffer vers Cloudinary
+ * @param {Buffer} buffer - Le fichier en mémoire
+ * @param {string} folder - Le dossier dans Cloudinary
+ * @returns {Promise<Object>} - Résultat Cloudinary avec secure_url
+ */
+const uploadToCloudinary = (buffer, folder = 'evenements') => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { 
+                folder: `innovevents/${folder}`,
+                resource_type: 'image'
+            },
+            (error, result) => {
+                if (error) {
+                    console.error('Erreur Cloudinary upload:', error);
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            }
+        );
+        Readable.from(buffer).pipe(stream);
+    });
+};
+
+/**
+ * Supprime une image de Cloudinary
+ * @param {string} imageUrl - URL complète de l'image Cloudinary
+ */
+const deleteFromCloudinary = async (imageUrl) => {
+    if (!imageUrl || !imageUrl.includes('cloudinary')) return;
+    
+    try {
+        // Extraire le public_id de l'URL Cloudinary
+        // URL format: https://res.cloudinary.com/xxx/image/upload/v123/innovevents/evenements/abc123.jpg
+        const urlParts = imageUrl.split('/');
+        const uploadIndex = urlParts.indexOf('upload');
+        
+        if (uploadIndex !== -1) {
+            // Récupérer tout après 'upload/vXXX/'
+            const pathAfterUpload = urlParts.slice(uploadIndex + 2).join('/');
+            // Enlever l'extension
+            const publicId = pathAfterUpload.replace(/\.[^/.]+$/, '');
+            
+            console.log('Suppression Cloudinary public_id:', publicId);
+            await cloudinary.uploader.destroy(publicId);
+        }
+    } catch (err) {
+        console.error('Erreur suppression Cloudinary:', err);
+    }
+};
+
+module.exports = { 
+    uploadEvenement, 
+    uploadToCloudinary, 
+    deleteFromCloudinary 
+};
