@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/27</span>
+                <span class='fraction'>0/29</span>
             </div>
         
             
@@ -259,8 +259,7 @@
 <a name='L194'></a><a href='#L194'>194</a>
 <a name='L195'></a><a href='#L195'>195</a>
 <a name='L196'></a><a href='#L196'>196</a>
-<a name='L197'></a><a href='#L197'>197</a>
-<a name='L198'></a><a href='#L198'>198</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L197'></a><a href='#L197'>197</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -456,8 +455,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * Model Tache
  * @module models/Tache
  */
@@ -475,7 +473,7 @@ class Tache {
                    e.nom_evenement
             FROM tache t
             INNER JOIN utilisateur u ON t.id_utilisateur = u.id_utilisateur
-            INNER JOIN evenement e ON t.id_evenement = e.id_evenement
+            LEFT JOIN evenement e ON t.id_evenement = e.id_evenement
             WHERE 1=1
         `;
         const params = <span class="cstat-no" title="statement not covered" >[];</span>
@@ -523,7 +521,7 @@ class Tache {
         const sql = <span class="cstat-no" title="statement not covered" >`</span>
             SELECT t.*, e.nom_evenement
             FROM tache t
-            INNER JOIN evenement e ON t.id_evenement = e.id_evenement
+            LEFT JOIN evenement e ON t.id_evenement = e.id_evenement
             WHERE t.id_utilisateur = $1
             ORDER BY t.date_echeance ASC NULLS LAST
         `;
@@ -541,7 +539,7 @@ class Tache {
                    e.nom_evenement
             FROM tache t
             INNER JOIN utilisateur u ON t.id_utilisateur = u.id_utilisateur
-            INNER JOIN evenement e ON t.id_evenement = e.id_evenement
+            LEFT JOIN evenement e ON t.id_evenement = e.id_evenement
             WHERE t.id_tache = $1
         `;
         const result = <span class="cstat-no" title="statement not covered" >await query(sql, [id]);</span>
@@ -562,7 +560,7 @@ class Tache {
             VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *
         `;
-        const params = <span class="cstat-no" title="statement not covered" >[titre_tache, description_tache || null, statut_tache, date_echeance || null, id_utilisateur, id_evenement];</span>
+        const params = <span class="cstat-no" title="statement not covered" >[titre_tache, description_tache || null, statut_tache, date_echeance || null, id_utilisateur, id_evenement || null];</span>
         const result = <span class="cstat-no" title="statement not covered" >await query(sql, params);</span>
 <span class="cstat-no" title="statement not covered" >        return result.rows[0];</span>
     }
@@ -575,7 +573,7 @@ class Tache {
         const params = <span class="cstat-no" title="statement not covered" >[];</span>
         let paramIndex = <span class="cstat-no" title="statement not covered" >1;</span>
 &nbsp;
-        const allowedFields = <span class="cstat-no" title="statement not covered" >['titre_tache', 'description_tache', 'statut_tache', 'date_echeance', 'id_utilisateur'];</span>
+        const allowedFields = <span class="cstat-no" title="statement not covered" >['titre_tache', 'description_tache', 'statut_tache', 'date_echeance', 'id_utilisateur', 'id_evenement'];</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        for (const [key, value] of Object.entries(data)) {</span>
 <span class="cstat-no" title="statement not covered" >            if (allowedFields.includes(key) &amp;&amp; value !== undefined) {</span>
@@ -626,7 +624,7 @@ class Tache {
                    e.nom_evenement
             FROM tache t
             INNER JOIN utilisateur u ON t.id_utilisateur = u.id_utilisateur
-            INNER JOIN evenement e ON t.id_evenement = e.id_evenement
+            LEFT JOIN evenement e ON t.id_evenement = e.id_evenement
             WHERE t.date_echeance &lt; CURRENT_DATE
               AND t.statut_tache != 'termine'
             ORDER BY t.date_echeance ASC
@@ -653,15 +651,14 @@ class Tache {
     }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = Tache;</span>
-&nbsp;</pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >module.exports = Tache;</span></pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-19T12:02:26.239Z
+                at 2026-01-24T14:40:39.341Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -2,436 +2,499 @@
 
 Application web de gestion d'événements pour l'agence Innov'Events.
 
-![Node.js](https://img.shields.io/badge/Node.js-20+-green)
-![React](https://img.shields.io/badge/React-18+-blue)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue)
-![MongoDB](https://img.shields.io/badge/MongoDB-7+-green)
-![Docker](https://img.shields.io/badge/Docker-Ready-blue)
-![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-orange)
-![Deploy](https://img.shields.io/badge/Deploy-Render-purple)
+![Node.js](https://img.shields.io/badge/Node.js-20-green?logo=node.js)
+![React](https://img.shields.io/badge/React-19-blue?logo=react)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?logo=postgresql)
+![MongoDB](https://img.shields.io/badge/MongoDB-7-green?logo=mongodb)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)
+![Render](https://img.shields.io/badge/Deploy-Render-purple?logo=render)
+
+---
 
 ## 🌐 Démo en ligne
 
 | Service | URL |
 |---------|-----|
-| **Frontend** | [https://innovevents-frontend.onrender.com](https://innovevents-frontend.onrender.com) |
-| **Backend API** | [https://innovevents-manager.onrender.com](https://innovevents-manager.onrender.com) |
+| **Application** | [innovevents-frontend.onrender.com](https://innovevents-frontend.onrender.com) |
+| **API** | [innovevents-manager.onrender.com](https://innovevents-manager.onrender.com) |
 
-> ⚠️ **Note** : Le premier accès peut prendre ~30 secondes (plan gratuit Render).
+> ⏳ Premier accès lent (~30s) = serveur qui se réveille (plan gratuit)
 
 ---
 
-## 📋 Table des matières
+## 📋 Sommaire
 
 - [Fonctionnalités](#-fonctionnalités)
 - [Technologies](#-technologies)
-- [Architecture](#-architecture)
-- [Prérequis](#-prérequis)
-- [Installation locale](#-installation-locale)
-- [Configuration](#-configuration)
-- [Lancement](#-lancement)
+- [Installation rapide (5 min)](#-installation-rapide-5-min)
+- [Installation détaillée](#-installation-détaillée)
+- [Accès à l'application](#-accès-à-lapplication)
+- [Configuration des services externes](#-configuration-des-services-externes)
+- [Commandes utiles](#-commandes-utiles)
 - [Tests](#-tests)
-- [Déploiement](#-déploiement)
-- [CI/CD Pipeline](#-cicd-pipeline)
-- [API Documentation](#-api-documentation)
+- [Problèmes courants](#-problèmes-courants)
 - [Structure du projet](#-structure-du-projet)
-- [Git Workflow](#-git-workflow)
+- [API Documentation](#-api-documentation)
 
 ---
 
 ## ✨ Fonctionnalités
 
-### 🌐 Site Public
-- Page d'accueil avec présentation de l'entreprise
-- Catalogue des événements réalisés (avec filtres)
-- Formulaire de demande de devis
-- Page de contact
-- Avis clients validés
-- Mentions légales (RGPD)
-
-### 👤 Espace Client
-- Tableau de bord personnalisé
-- Suivi des événements
-- Gestion des devis (accepter/refuser/demander modification)
-- Dépôt d'avis après événement
-- Gestion du profil et suppression RGPD
-
-### 👷 Espace Employé
-- Consultation des clients et événements
-- Gestion des notes collaboratives
-- Suivi et mise à jour des tâches assignées
-- Validation/refus des avis clients
-
-### 👑 Espace Administrateur
-- Tableau de bord avec KPIs
-- Gestion complète des prospects
-- Conversion prospect → client + événement
-- Création et envoi de devis PDF
-- Gestion des événements et prestations
-- Upload d'images (stockage Cloudinary)
-- Gestion des employés
-- Journalisation des actions (MongoDB)
-- Modération des avis
-
-### 🔐 Sécurité
-- Authentification JWT (access + refresh tokens)
-- Hashage des mots de passe (bcrypt)
-- Validation des entrées côté serveur
-- Protection XSS (React + Helmet)
-- Protection injection SQL (requêtes paramétrées)
-- Rate limiting
-- CORS configuré
-- Changement de mot de passe obligatoire (première connexion)
+| Espace | Fonctionnalités |
+|--------|-----------------|
+| **🌐 Public** | Accueil, événements, demande de devis, contact, avis, RGPD |
+| **👤 Client** | Dashboard, suivi événements, gestion devis, dépôt avis, profil |
+| **👷 Employé** | Consultation clients/événements, notes, tâches, validation avis |
+| **👑 Admin** | Gestion complète + prospects + devis PDF + employés + logs |
 
 ---
 
 ## 🛠 Technologies
 
-### Backend
-| Technologie | Version | Usage |
-|-------------|---------|-------|
-| Node.js | 20+ | Runtime JavaScript |
-| Express.js | 4.x | Framework web |
-| PostgreSQL | 15+ | Base de données relationnelle |
-| MongoDB | 7+ | Journalisation (logs) |
-| JWT | - | Authentification |
-| Nodemailer | - | Envoi d'emails |
-| PDFKit | - | Génération de devis PDF |
-| Cloudinary | - | Stockage d'images (CDN) |
-
-### Frontend
-| Technologie | Version | Usage |
-|-------------|---------|-------|
-| React | 18+ | Bibliothèque UI |
-| Vite | 5+ | Build tool |
-| Tailwind CSS | 3+ | Framework CSS |
-| React Router | 6+ | Navigation SPA |
-| Axios | - | Client HTTP |
-| Lucide React | - | Icônes |
-
-### DevOps
-| Technologie | Usage |
-|-------------|-------|
-| Docker | Conteneurisation |
-| Docker Compose | Orchestration locale |
-| GitHub Actions | CI/CD Pipeline |
-| Render | Hébergement cloud |
-| Docker Hub | Registry d'images |
-| MongoDB Atlas | Base NoSQL cloud |
-| Cloudinary | CDN images |
+| Backend | Frontend | Base de données | DevOps |
+|---------|----------|-----------------|--------|
+| Node.js 20 | React 19 | PostgreSQL 15 | Docker |
+| Express.js | Vite | MongoDB 7 | GitHub Actions |
+| JWT | Tailwind CSS | Cloudinary | Render |
+| Nodemailer | React Router | | |
 
 ---
 
-## 🏗 Architecture
+## 🚀 Installation rapide (5 min)
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      ARCHITECTURE DE PRODUCTION                  │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│   👨‍💻 Développeur                                                │
-│        │                                                         │
-│        ▼ git push                                                │
-│   ┌─────────┐      ┌──────────────┐      ┌─────────────┐        │
-│   │ GitHub  │ ───► │GitHub Actions│ ───► │ Docker Hub  │        │
-│   └─────────┘      └──────────────┘      └─────────────┘        │
-│                           │                                      │
-│                           ▼ deploy                               │
-│              ┌────────────────────────────┐                     │
-│              │         RENDER             │                     │
-│              │  ┌──────────┐ ┌─────────┐  │                     │
-│              │  │ Backend  │ │Frontend │  │                     │
-│              │  │  (API)   │ │  (SPA)  │  │                     │
-│              │  └────┬─────┘ └─────────┘  │                     │
-│              │       │                    │                     │
-│              │  ┌────▼─────┐              │                     │
-│              │  │PostgreSQL│              │                     │
-│              │  └──────────┘              │                     │
-│              └────────────────────────────┘                     │
-│                      │                                          │
-│         ┌────────────┼────────────┐                             │
-│         ▼            ▼            ▼                             │
-│   ┌──────────┐ ┌──────────┐ ┌──────────┐                       │
-│   │ MongoDB  │ │Cloudinary│ │  SMTP    │                       │
-│   │  Atlas   │ │  (CDN)   │ │ (Email)  │                       │
-│   └──────────┘ └──────────┘ └──────────┘                       │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+### Prérequis
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installé et lancé
+- [Git](https://git-scm.com/)
+
+### Commandes
+
+```bash
+# 1. Cloner le projet
+git clone https://github.com/VOTRE_USERNAME/innovevents-manager.git
+cd innovevents-manager
+
+# 2. Créer le fichier de configuration
+cp .env.example .env
+
+# 3. Lancer l'application
+docker compose up -d --build
+
+# 4. Vérifier que tout tourne
+docker compose ps
 ```
 
+### Accès
+
+| Service | URL |
+|---------|-----|
+| **Frontend** | http://localhost:5173 |
+| **Backend API** | http://localhost:3000 |
+
+### Compte admin par défaut
+
+| Email | Mot de passe |
+|-------|--------------|
+| chloe@innovevents.com | Innovevents2024! |
+
+> 💡 **Tip** : Pour charger les données de test complètes :
+> ```bash
+> docker compose exec app node database/seed.js
+> ```
+
 ---
 
-## 📦 Prérequis
+## 📝 Installation détaillée
 
-### Pour le développement local (Docker)
-- [Docker](https://docs.docker.com/get-docker/) (v20+)
-- [Docker Compose](https://docs.docker.com/compose/install/) (v2+)
-- [Git](https://git-scm.com/downloads)
+### Étape 1 : Prérequis
 
-### Pour le développement local (sans Docker)
-- [Node.js](https://nodejs.org/) (v20+)
-- [PostgreSQL](https://www.postgresql.org/download/) (v15+)
-- [MongoDB](https://www.mongodb.com/try/download/community) (v7+)
+Vérifiez que Docker est installé et lancé :
 
----
+```bash
+docker --version
+# Docker version 24.x.x ou supérieur
+```
 
-## 🚀 Installation locale
+### Étape 2 : Cloner le projet
 
-### 1. Cloner le repository
 ```bash
 git clone https://github.com/VOTRE_USERNAME/innovevents-manager.git
 cd innovevents-manager
 ```
 
-### 2. Configurer les variables d'environnement
+### Étape 3 : Configuration
+
 ```bash
+# Copier le fichier d'exemple
 cp .env.example .env
 ```
 
-### 3. Éditer le fichier `.env`
-```env
-# Application
-NODE_ENV=development
-PORT=3000
-FRONTEND_URL=http://localhost:5173
+Le fichier `.env` contient des valeurs par défaut qui fonctionnent immédiatement avec Docker.
 
-# PostgreSQL
-POSTGRES_HOST=postgres
-POSTGRES_PORT=5432
-POSTGRES_USER=innovevents
-POSTGRES_PASSWORD=innovevents123
-POSTGRES_DB=innovevents_db
+**Personnalisations optionnelles :**
 
-# MongoDB (local)
-MONGO_URI=mongodb://innovevents:innovevents123@mongodb:27017/innovevents_logs?authSource=admin
+| Variable | Pourquoi la modifier |
+|----------|---------------------|
+| `JWT_SECRET` | 🔒 **Obligatoire en production** - Sécurité |
+| `SMTP_*` | Si vous voulez envoyer des emails |
+| `CLOUDINARY_*` | Si vous voulez que les images persistent |
 
-# JWT
-JWT_SECRET=votre_secret_jwt_tres_long_et_securise
-JWT_EXPIRES_IN=24h
-JWT_REFRESH_SECRET=votre_refresh_secret_encore_plus_long
-JWT_REFRESH_EXPIRES_IN=7d
+### Étape 4 : Lancer l'application
 
-# SMTP (emails)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=votre_email@gmail.com
-SMTP_PASS=votre_mot_de_passe_application
-SMTP_FROM=contact@innovevents.com
-SMTP_FROM_NAME=Innov'Events
+```bash
+docker compose up -d --build
+```
 
-# Cloudinary (images)
-CLOUDINARY_CLOUD_NAME=votre_cloud_name
-CLOUDINARY_API_KEY=votre_api_key
-CLOUDINARY_API_SECRET=votre_api_secret
+> ⏳ Première exécution : ~2-5 minutes (téléchargement des images)
+
+### Étape 5 : Vérifier le statut
+
+```bash
+docker compose ps
+```
+
+Vous devez voir :
+
+| Conteneur | Statut |
+|-----------|--------|
+| innovevents-app | ✅ Up |
+| innovevents-frontend | ✅ Up |
+| innovevents-postgres | ✅ Up |
+| innovevents-mongodb | ✅ Up |
+| innovevents-pgadmin | ✅ Up |
+| innovevents-mongo-express | ✅ Up |
+
+### Étape 6 : Voir les logs
+
+```bash
+# Tous les services
+docker compose logs -f
+
+# Un service spécifique
+docker compose logs -f app
+```
+
+Attendez de voir :
+```
+✅ PostgreSQL connecté
+✅ MongoDB connecté
+🚀 Serveur démarré sur le port 3000
 ```
 
 ---
 
-## 🎬 Lancement
+## 🌐 Accès à l'application
 
-### Avec Docker (Recommandé) 🐳
-
-```bash
-# Construire et démarrer tous les services
-docker-compose up -d --build
-
-# Voir les logs
-docker-compose logs -f
-
-# Voir les logs d'un service spécifique
-docker-compose logs -f app
-
-# Arrêter les services
-docker-compose down
-
-# Arrêter et supprimer les volumes (reset complet)
-docker-compose down -v
-```
-
-### Sans Docker
-
-**Terminal 1 - Backend :**
-```bash
-npm install
-npm run dev
-```
-
-**Terminal 2 - Frontend :**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Accès aux services (local)
+### Services principaux
 
 | Service | URL | Description |
 |---------|-----|-------------|
 | **Frontend** | http://localhost:5173 | Application React |
 | **Backend API** | http://localhost:3000 | API REST |
-| **PgAdmin** | http://localhost:5050 | Interface PostgreSQL |
+| **pgAdmin** | http://localhost:5050 | Interface PostgreSQL |
 | **Mongo Express** | http://localhost:8081 | Interface MongoDB |
 
-### Comptes par défaut
+### Connexion pgAdmin
+
+| Champ | Valeur |
+|-------|--------|
+| Email | `admin@admin.com` |
+| Mot de passe | `admin123` |
+
+Pour se connecter à PostgreSQL dans pgAdmin :
+1. Clic droit "Servers" → "Register" → "Server"
+2. **General** → Name: `InnovEvents`
+3. **Connection** :
+   - Host: `postgres` _(pas localhost !)_
+   - Port: `5432`
+   - Database: `innovevents_db`
+   - Username: `innovevents`
+   - Password: `innovevents123`
+
+### Connexion Mongo Express
+
+| Champ | Valeur |
+|-------|--------|
+| Username | `admin` |
+| Password | `admin123` |
+
+### Compte administrateur
 
 | Rôle | Email | Mot de passe |
 |------|-------|--------------|
 | Admin | chloe@innovevents.com | Innovevents2024! |
 
-> ⚠️ **Important** : Changez les mots de passe par défaut en production !
+---
+
+## ⚙️ Configuration des services externes
+
+### 📷 Cloudinary (Stockage d'images)
+
+**Sans Cloudinary** : Les images fonctionnent mais sont perdues à chaque redémarrage Docker.
+
+**Avec Cloudinary** : Les images sont stockées de façon permanente.
+
+1. Créez un compte gratuit sur [cloudinary.com](https://cloudinary.com/)
+2. Dashboard → Copiez vos credentials
+3. Ajoutez dans `.env` :
+
+```env
+CLOUDINARY_CLOUD_NAME=votre_cloud_name
+CLOUDINARY_API_KEY=123456789012345
+CLOUDINARY_API_SECRET=aBcDeFgHiJkLmNoPqRsTuVwXyZ
+```
+
+4. Relancez : `docker compose up -d --build`
+
+### 📧 Gmail SMTP (Envoi d'emails)
+
+**Sans SMTP** : L'application fonctionne mais n'envoie pas d'emails.
+
+1. Activez la [validation 2 étapes](https://myaccount.google.com/security) Google
+2. Créez un [App Password](https://myaccount.google.com/apppasswords)
+3. Ajoutez dans `.env` :
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=votre_email@gmail.com
+SMTP_PASS=abcd efgh ijkl mnop
+SMTP_FROM=votre_email@gmail.com
+SMTP_FROM_NAME=Innov'Events
+```
+
+4. Relancez : `docker compose up -d`
+
+---
+
+## 🔧 Commandes utiles
+
+### Docker Compose
+
+> ⚠️ Utilisez `docker compose` (avec espace), pas `docker-compose`
+
+```bash
+# Démarrer
+docker compose up -d
+
+# Démarrer + rebuild (après modification de code ou dépendances)
+docker compose up -d --build
+
+# Arrêter
+docker compose down
+
+# Arrêter + supprimer les données (reset complet)
+docker compose down -v
+
+# Voir les logs en temps réel
+docker compose logs -f
+
+# Logs d'un service
+docker compose logs -f app
+docker compose logs -f frontend
+docker compose logs -f postgres
+
+# Statut des conteneurs
+docker compose ps
+
+# Redémarrer un service
+docker compose restart app
+
+# Exécuter une commande dans un conteneur
+docker compose exec app npm install nouvelle-lib
+```
+
+### Accès direct aux conteneurs
+
+```bash
+# Shell dans le backend
+docker compose exec app sh
+
+# Shell dans PostgreSQL
+docker compose exec postgres psql -U innovevents -d innovevents_db
+
+# Shell dans MongoDB
+docker compose exec mongodb mongosh -u innovevents -p innovevents123
+```
+
+---
+
+## 🗃️ Base de données
+
+### Initialisation automatique (Docker)
+
+Avec Docker, la base de données est **automatiquement initialisée** au premier lancement grâce au fichier `database/init.sql`.
+
+### Ajouter les données de test
+
+```bash
+# Depuis l'intérieur du conteneur
+docker compose exec app node database/seed.js
+
+# Ou initialisation complète (schéma + données)
+docker compose exec app node database/init-db.js
+```
+
+### Scripts disponibles
+
+| Script | Usage | Description |
+|--------|-------|-------------|
+| `database/init.sql` | Auto (Docker) | Crée les tables (schéma uniquement) |
+| `database/seed.js` | Manuel | Ajoute les données de test |
+| `database/init-db.js` | Manuel | Reset complet (schéma + données) |
+
+### Données de test créées
+
+| Table | Nombre | Exemples |
+|-------|--------|----------|
+| Utilisateurs | 6 | 1 admin, 2 employés, 3 clients |
+| Prospects | 5 | 3 convertis, 1 à contacter, 1 échoué |
+| Clients | 3 | Tech Solutions, StartUp Nation, Corporate Group |
+| Événements | 4 | Séminaires, conférences, gala |
+| Devis | 4 | Différents statuts |
+| Prestations | 10 | Locations, traiteurs, animations |
+| Notes | 5 | Notes sur événements |
+| Tâches | 8 | À faire, en cours, terminées |
+| Avis | 2 | Validé et en attente |
+| Contacts | 3 | Messages du formulaire |
+
+### Comptes de test
+
+| Rôle | Email | Mot de passe |
+|------|-------|--------------|
+| **Admin** | chloe@innovevents.com | Innovevents2024! |
+| Employé | jose@innovevents.com | Innovevents2024! |
+| Employé | marie@innovevents.com | Innovevents2024! |
+| Client | pierre.bernard@entreprise.com | Innovevents2024! |
+| Client | sophie.leroy@startup.fr | Innovevents2024! |
+| Client | marc.petit@corporate.com | Innovevents2024! |
+
+### Reset de la base de données
+
+```bash
+# Option 1 : Via le script (garde les volumes Docker)
+docker compose exec app node database/init-db.js
+
+# Option 2 : Reset complet (supprime tout)
+docker compose down -v
+docker compose up -d --build
+```
 
 ---
 
 ## 🧪 Tests
 
-Le projet inclut **47 tests** répartis en 3 catégories :
+```bash
+# Tests backend (unitaires + intégration)
+docker compose exec app npm test
 
-| Type | Framework | Nombre | Commande |
-|------|-----------|--------|----------|
-| Unitaires | Jest | 21 | `npm test` |
-| Intégration (API) | Jest + Supertest | 16 | `npm test` |
-| End-to-End | Playwright | 10 | `npm run test:e2e` |
+# Tests frontend E2E
+docker compose exec frontend npm run test:e2e
+```
 
-### Lancer les tests
+| Type | Framework | Nombre |
+|------|-----------|--------|
+| Unitaires | Jest | 21 |
+| Intégration API | Jest + Supertest | 16 |
+| End-to-End | Playwright | 10 |
+
+---
+
+## ❓ Problèmes courants
+
+### `docker-compose: command not found`
+
+**Solution** : Utilisez `docker compose` (avec espace)
 
 ```bash
-# Tous les tests unitaires et intégration
-npm test
+# ❌ Ancien
+docker-compose up -d
 
-# Avec couverture de code
-npm run test:coverage
-
-# Tests E2E (nécessite l'app lancée)
-npm run test:e2e
-
-# Tests E2E avec interface visuelle
-npm run test:e2e:ui
+# ✅ Nouveau (Docker Desktop)
+docker compose up -d
 ```
 
-### Couverture des tests
+### `Cannot find module 'xxx'`
 
-| Module | Tests |
-|--------|-------|
-| Validation (mot de passe, email) | 8 |
-| Calculs (TVA, montants) | 3 |
-| Utilitaires (génération devis, rôles) | 4 |
-| Statuts (événements, tâches) | 6 |
-| API Auth (register, login, profil) | 16 |
-| E2E (navigation, formulaires) | 10 |
+**Solution** : Rebuild les conteneurs
 
----
+```bash
+docker compose down
+docker compose up -d --build
+```
 
-## 🚀 Déploiement
+### `ENOTFOUND postgres` ou `Connection refused`
 
-### Services de production
+**Solution** : PostgreSQL n'est pas encore prêt
 
-| Service | Plateforme | URL |
-|---------|------------|-----|
-| Backend | Render (Web Service) | https://innovevents-manager.onrender.com |
-| Frontend | Render (Static Site) | https://innovevents-frontend.onrender.com |
-| PostgreSQL | Render | Connexion interne |
-| MongoDB | MongoDB Atlas | Cluster cloud |
-| Images | Cloudinary | CDN mondial |
-| Docker Images | Docker Hub | tikaya/innovevents-manager |
+```bash
+# Vérifiez le statut
+docker compose ps
 
-### Variables d'environnement (Production)
+# Attendez et réessayez
+docker compose restart app
+```
 
-À configurer sur Render (Backend Web Service) :
+### Les images disparaissent après redémarrage
 
-```env
-NODE_ENV=production
-PORT=3000
-FRONTEND_URL=https://innovevents-frontend.onrender.com
+**Solution** : Configurez Cloudinary (voir section Configuration)
 
-# PostgreSQL (fourni par Render)
-POSTGRES_HOST=xxx.render.com
-POSTGRES_PORT=5432
-POSTGRES_USER=xxx
-POSTGRES_PASSWORD=xxx
-POSTGRES_DB=innovevents_db
+### Port déjà utilisé
 
-# MongoDB Atlas
-MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/innovevents_logs
+**Solution** : Modifiez les ports dans `docker-compose.yml` ou arrêtez le service existant
 
-# JWT
-JWT_SECRET=xxx
-JWT_EXPIRES_IN=24h
-JWT_REFRESH_SECRET=xxx
-JWT_REFRESH_EXPIRES_IN=7d
+```bash
+# Voir ce qui utilise le port 3000
+lsof -i :3000
 
-# SMTP
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=xxx
-SMTP_PASS=xxx
+# Ou changez le port dans docker-compose.yml
+ports:
+  - "3001:3000"  # 3001 au lieu de 3000
+```
 
-# Cloudinary
-CLOUDINARY_CLOUD_NAME=xxx
-CLOUDINARY_API_KEY=xxx
-CLOUDINARY_API_SECRET=xxx
+### Reset complet (tout recommencer)
+
+```bash
+# Arrêter et supprimer tout
+docker compose down -v
+
+# Supprimer les images
+docker rmi innovevents-manager-app innovevents-manager-frontend
+
+# Relancer
+docker compose up -d --build
 ```
 
 ---
 
-## 🔄 CI/CD Pipeline
-
-Le projet utilise **GitHub Actions** pour l'intégration et le déploiement continus.
-
-### Pipeline (5 étapes)
+## 📁 Structure du projet
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        CI/CD PIPELINE                           │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│   ┌──────────────┐     ┌──────────────┐                        │
-│   │Tests Backend │     │Tests Frontend│    ← Étape 1 : Tests   │
-│   │     🧪       │     │      🧪      │                        │
-│   └──────┬───────┘     └──────┬───────┘                        │
-│          │                    │                                 │
-│          └────────┬───────────┘                                 │
-│                   ▼                                             │
-│          ┌──────────────┐                                       │
-│          │ Build Docker │              ← Étape 2 : Build       │
-│          │      🐳      │                                       │
-│          └──────┬───────┘                                       │
-│                 ▼                                               │
-│          ┌──────────────┐                                       │
-│          │Push Docker   │              ← Étape 3 : Push        │
-│          │    Hub 📦    │                                       │
-│          └──────┬───────┘                                       │
-│                 ▼                                               │
-│   ┌──────────────┐     ┌──────────────┐                        │
-│   │Deploy Backend│     │Deploy Frontend│   ← Étape 4 : Deploy  │
-│   │      🚀      │     │      🚀       │                        │
-│   └──────┬───────┘     └──────┬────────┘                        │
-│          │                    │                                 │
-│          └────────┬───────────┘                                 │
-│                   ▼                                             │
-│          ┌──────────────┐                                       │
-│          │   Notify 📢  │              ← Étape 5 : Résumé      │
-│          └──────────────┘                                       │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+innovevents-manager/
+├── 📁 database/
+│   └── init.sql              # Création des tables PostgreSQL
+├── 📁 frontend/              # Application React
+│   ├── 📁 src/
+│   │   ├── 📁 components/    # Composants réutilisables
+│   │   ├── 📁 pages/         # Pages de l'application
+│   │   ├── 📁 context/       # Contextes React (Auth)
+│   │   ├── 📁 services/      # Appels API (Axios)
+│   │   └── App.jsx
+│   ├── Dockerfile
+│   └── package.json
+├── 📁 src/                   # Backend Node.js
+│   ├── 📁 config/            # Configuration (DB, Cloudinary)
+│   ├── 📁 controllers/       # Logique des routes
+│   ├── 📁 middlewares/       # Auth, validation, upload
+│   ├── 📁 models/            # Requêtes SQL
+│   ├── 📁 routes/            # Définition des routes
+│   └── index.js              # Point d'entrée
+├── 📁 tests/                 # Tests unitaires et E2E
+├── docker-compose.yml        # Orchestration Docker
+├── Dockerfile                # Image backend
+├── .env.example              # Template configuration
+└── package.json
 ```
-
-### Déclencheurs
-
-| Événement | Action |
-|-----------|--------|
-| Push sur `main` | Tests + Build + Deploy |
-| Push sur `dev` | Tests + Build |
-| Pull Request sur `main` | Tests uniquement |
-| Manuel | Workflow dispatch |
-
-### Secrets GitHub requis
-
-| Secret | Description |
-|--------|-------------|
-| `DOCKER_USERNAME` | Username Docker Hub |
-| `DOCKER_TOKEN` | Token d'accès Docker Hub |
-| `RENDER_DEPLOY_HOOK_URL` | Webhook déploiement Backend |
-| `RENDER_DEPLOY_HOOK_FRONTEND` | Webhook déploiement Frontend |
 
 ---
 
@@ -442,27 +505,25 @@ Le projet utilise **GitHub Actions** pour l'intégration et le déploiement cont
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
 | POST | `/api/auth/register` | Inscription |
-| POST | `/api/auth/login` | Connexion |
+| POST | `/api/auth/login` | Connexion → retourne JWT |
 | POST | `/api/auth/logout` | Déconnexion |
-| POST | `/api/auth/refresh` | Rafraîchir le token |
-| POST | `/api/auth/forgot-password` | Mot de passe oublié |
-| PUT | `/api/auth/change-password` | Changer mot de passe |
-| GET | `/api/auth/me` | Profil utilisateur |
+| GET | `/api/auth/me` | Profil (🔒 Auth) |
 
 ### Ressources
 
-| Ressource | Méthodes | Accès |
-|-----------|----------|-------|
-| `/api/prospects` | GET, POST, PUT, DELETE | Admin |
-| `/api/clients` | GET, POST, PUT, DELETE | Admin, Employé |
-| `/api/evenements` | GET, POST, PUT, DELETE | Admin, Employé, Client |
-| `/api/devis` | GET, POST, PUT, DELETE | Admin, Client |
-| `/api/prestations` | GET, POST, PUT, DELETE | Admin |
-| `/api/avis` | GET, POST, PUT, DELETE | Admin, Employé, Client |
-| `/api/taches` | GET, POST, PUT, DELETE | Admin, Employé |
-| `/api/notes` | GET, POST, PUT, DELETE | Admin, Employé |
-| `/api/contact` | POST | Public |
-| `/api/logs` | GET | Admin |
+| Ressource | GET | POST | PUT | DELETE | Accès |
+|-----------|-----|------|-----|--------|-------|
+| `/api/prospects` | ✅ | ✅ | ✅ | ✅ | Admin |
+| `/api/clients` | ✅ | ✅ | ✅ | ✅ | Admin |
+| `/api/evenements` | ✅ | ✅ | ✅ | ✅ | Tous* |
+| `/api/devis` | ✅ | ✅ | ✅ | ✅ | Admin, Client |
+| `/api/avis` | ✅ | ✅ | ✅ | ✅ | Tous* |
+| `/api/taches` | ✅ | ✅ | ✅ | ✅ | Admin, Employé |
+| `/api/notes` | ✅ | ✅ | ✅ | ✅ | Admin, Employé |
+| `/api/contact` | - | ✅ | - | - | Public |
+| `/api/logs` | ✅ | - | - | - | Admin |
+
+*Selon le rôle et la propriété des données
 
 ### Format des réponses
 
@@ -470,8 +531,7 @@ Le projet utilise **GitHub Actions** pour l'intégration et le déploiement cont
 ```json
 {
   "success": true,
-  "data": { ... },
-  "message": "Opération réussie"
+  "data": { ... }
 }
 ```
 
@@ -485,119 +545,23 @@ Le projet utilise **GitHub Actions** pour l'intégration et le déploiement cont
 
 ---
 
-## 📁 Structure du projet
+## 🚀 Déploiement
 
-```
-innovevents-manager/
-├── .github/
-│   └── workflows/
-│       └── ci-cd.yml          # Pipeline GitHub Actions
-├── src/                        # Code source backend
-│   ├── config/                # Configuration (DB, MongoDB, Cloudinary)
-│   ├── controllers/           # Contrôleurs API
-│   ├── middlewares/           # Middlewares (auth, validation, upload)
-│   ├── models/                # Modèles de données
-│   ├── routes/                # Routes API
-│   ├── services/              # Logique métier
-│   ├── utils/                 # Utilitaires
-│   └── app.js                 # Point d'entrée
-├── frontend/                   # Code source frontend
-│   ├── src/
-│   │   ├── components/        # Composants React réutilisables
-│   │   ├── pages/             # Pages de l'application
-│   │   ├── context/           # Contextes React (Auth, Theme)
-│   │   ├── services/          # Services API (Axios)
-│   │   ├── hooks/             # Hooks personnalisés
-│   │   └── App.jsx            # Composant principal
-│   ├── public/                # Assets statiques
-│   ├── Dockerfile             # Image Docker frontend
-│   └── vite.config.js         # Configuration Vite
-├── tests/                      # Tests
-│   ├── unit/                  # Tests unitaires
-│   ├── integration/           # Tests d'intégration API
-│   └── e2e/                   # Tests End-to-End
-├── docker-compose.yml          # Orchestration Docker (dev)
-├── Dockerfile                  # Image Docker backend
-├── .env.example               # Template variables d'environnement
-├── package.json               # Dépendances backend
-└── README.md                  # Ce fichier
-```
+L'application est déployée sur **Render** avec :
+- Backend : Web Service
+- Frontend : Static Site
+- PostgreSQL : Render PostgreSQL
+- MongoDB : MongoDB Atlas
+- Images : Cloudinary
 
----
-
-## 🔀 Git Workflow
-
-### Branches
-
-| Branche | Description |
-|---------|-------------|
-| `main` | Production - Code stable, déploiement auto |
-| `dev` | Développement - Intégration des features |
-
-### Workflow
-
-```bash
-# 1. Créer une branche depuis dev
-git checkout dev
-git pull origin dev
-git checkout -b feature/nom-fonctionnalite
-
-# 2. Développer et commiter
-git add .
-git commit -m "feat: description de la fonctionnalité"
-
-# 3. Pousser et créer une Pull Request
-git push origin feature/nom-fonctionnalite
-
-# 4. Après validation, merger dans dev puis main
-git checkout dev
-git merge feature/nom-fonctionnalite
-git push origin dev
-
-# 5. Déploiement en production
-git checkout main
-git merge dev
-git push origin main  # Déclenche le déploiement automatique
-```
-
-### Convention de commits
-
-| Préfixe | Description |
-|---------|-------------|
-| `feat:` | Nouvelle fonctionnalité |
-| `fix:` | Correction de bug |
-| `docs:` | Documentation |
-| `style:` | Formatage (pas de changement de code) |
-| `refactor:` | Refactorisation |
-| `test:` | Ajout/modification de tests |
-| `chore:` | Maintenance, dépendances |
-| `ci:` | Configuration CI/CD |
-
----
-
-## 🐛 Problèmes connus et solutions
-
-| Problème | Cause | Solution |
-|----------|-------|----------|
-| Images disparaissent après redéploiement | Système de fichiers éphémère Render | Utiliser Cloudinary ✅ |
-| Premier accès lent (~30s) | Spin-down du plan gratuit Render | Attendre ou upgrader le plan |
-| Erreur CORS sur les images | Helmet bloquant | URLs Cloudinary HTTPS ✅ |
+Le déploiement est automatique via **GitHub Actions** à chaque push sur `main`.
 
 ---
 
 ## 📧 Contact
 
-**Innov'Events**
-- 📧 Email : contact@innovevents.com
-- 📞 Téléphone : 01 23 45 67 89
-- 🌐 Site : https://innovevents-frontend.onrender.com
+**Johann KOUAKOU** - Projet CDA (Concepteur Développeur d'Applications)
 
 ---
 
-## 📄 Licence
-
-Ce projet est développé dans le cadre d'une formation **Concepteur Développeur d'Applications (CDA)**.
-
----
-
-Développé avec ❤️ par **Johann KOUAKOU** | 2024-2025
+Développé avec ❤️ | 2025-2026
