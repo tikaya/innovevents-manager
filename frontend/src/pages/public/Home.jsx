@@ -77,21 +77,36 @@ const Home = () => {
     { number: '5 ans', label: 'D\'expérience' },
   ];
 
-  const testimonials = [
-    {
-      name: 'Marie Dupont',
-      company: 'Tech Solutions',
-      text: 'Une équipe exceptionnelle qui a su comprendre nos besoins et créer un événement mémorable.',
-      rating: 5
-    },
-    {
-      name: 'Pierre Martin',
-      company: 'Finance Corp',
-      text: 'Professionnalisme et créativité au rendez-vous. Je recommande vivement !',
-      rating: 5
-    },
-  ];
-
+const testimonials = [
+  {
+    name: 'Marie Dupont',
+    company: 'Tech Solutions',
+    text: 'Une équipe exceptionnelle qui a su comprendre nos besoins et créer un événement mémorable.',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face'
+  },
+  {
+    name: 'Pierre Martin',
+    company: 'Finance Corp',
+    text: 'Professionnalisme et créativité au rendez-vous. Je recommande vivement !',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'
+  },
+  {
+    name: 'Sophie Bernard',
+    company: 'StartUp Nation',
+    text: 'Notre conférence annuelle a été un vrai succès grâce à Innov\'Events. Merci !',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=100&h=100&fit=crop&crop=face'
+  },
+  {
+    name: 'Thomas Leroy',
+    company: 'Corporate Group',
+    text: 'Le gala des 20 ans de notre entreprise restera gravé dans les mémoires.',
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face'
+  },
+];
   return (
     <div>
       {/* Hero Section */}
@@ -306,44 +321,49 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Témoignages */}
-      <section className="py-20 bg-bleu-ciel">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <span className="text-or font-semibold text-sm uppercase tracking-wider">Témoignages</span>
-            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-gris-ardoise mt-2 mb-4">
-              Ce que disent nos clients
-            </h2>
-          </div>
+  {/* Témoignages */}
+<section className="py-20 bg-bleu-ciel">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-16">
+      <span className="text-or font-semibold text-sm uppercase tracking-wider">Témoignages</span>
+      <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-gris-ardoise mt-2 mb-4">
+        Ce que disent nos clients
+      </h2>
+    </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-card p-8 shadow-card">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-or fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-600 italic mb-6">"{testimonial.text}"</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-bleu-ciel"></div>
-                  <div>
-                    <p className="font-semibold text-gris-ardoise">{testimonial.name}</p>
-                    <p className="text-sm text-gray-500">{testimonial.company}</p>
-                  </div>
-                </div>
-              </div>
+    <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      {testimonials.map((testimonial, index) => (
+        <div key={index} className="bg-white rounded-card p-8 shadow-card">
+          <div className="flex gap-1 mb-4">
+            {[...Array(testimonial.rating)].map((_, i) => (
+              <Star key={i} className="w-5 h-5 text-or fill-current" />
             ))}
           </div>
-
-          <div className="text-center mt-10">
-            <Link to="/avis" className="btn-secondary inline-flex items-center">
-              Voir tous les avis
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
+          <p className="text-gray-600 italic mb-6">"{testimonial.text}"</p>
+          <div className="flex items-center gap-4">
+            <img 
+              src={testimonial.image}
+              alt={`${testimonial.name} - ${testimonial.company}`}
+              className="w-12 h-12 rounded-full object-cover"
+              loading="lazy"
+            />
+            <div>
+              <p className="font-semibold text-gris-ardoise">{testimonial.name}</p>
+              <p className="text-sm text-gray-500">{testimonial.company}</p>
+            </div>
           </div>
         </div>
-      </section>
+      ))}
+    </div>
+
+    <div className="text-center mt-10">
+      <Link to="/avis" className="btn-secondary inline-flex items-center">
+        Voir tous les avis
+        <ArrowRight className="ml-2 w-4 h-4" />
+      </Link>
+    </div>
+  </div>
+</section>
 
       {/* CTA Section */}
       <section className="relative bg-gris-ardoise py-20 overflow-hidden">
