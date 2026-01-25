@@ -126,16 +126,28 @@ const Home = () => {
               </div>
 
               {/* Trust badges */}
-              <div className="flex items-center gap-6 mt-10 pt-10 border-t border-white/20">
-                <div className="flex -space-x-2">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="w-10 h-10 rounded-full bg-bleu-ciel border-2 border-white"></div>
-                  ))}
-                </div>
-                <div className="text-blue-100">
-                  <span className="text-white font-semibold">+200 clients</span> nous font confiance
-                </div>
-              </div>
+             {/* Trust badges */}
+<div className="flex items-center gap-6 mt-10 pt-10 border-t border-white/20">
+  <div className="flex -space-x-2">
+    {[
+      { url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face', name: 'Marie' },
+      { url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face', name: 'Pierre' },
+      { url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=80&h=80&fit=crop&crop=face', name: 'Sophie' },
+      { url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=80&h=80&fit=crop&crop=face', name: 'Thomas' }
+    ].map((client, i) => (
+      <img 
+        key={i} 
+        src={client.url}
+        alt={`${client.name} - Client satisfait`}
+        className="w-10 h-10 rounded-full border-2 border-white object-cover"
+        loading="lazy"
+      />
+    ))}
+  </div>
+  <div className="text-blue-100">
+    <span className="text-white font-semibold">+200 clients</span> nous font confiance
+  </div>
+</div>
             </div>
 
             {/* Hero Image */}
